@@ -2,13 +2,115 @@ import { format } from 'date-fns';
 import { User, Bot, Clock, AlertTriangle } from 'lucide-react';
 import { useTFL } from '../../contexts/TFLContext';
 
+// Utility function to strip any HTML tags and render clean markdown
+const stripHtmlTags = (str) => {
+  return str.replace(/<[^>]*>/g, '');
+};
+
+// Utility function to render markdown-like formatting
+const renderFormattedContent = (content, lineColor) => {
+  if (!content || typeof content !== 'string') {
+    return <span className="text-red-500">No content available</span>;
+  }
+
+  // Strip any HTML tags first for security and cleanliness
+  const cleanContent = stripHtmlTags(content);
+  
+  // Split content into lines and process each line
+  const lines = cleanContent.split('\n');
+  
+  return lines.map((line, index) => {
+    // Skip empty lines
+    if (!line.trim()) {
+      return <div key={index} className="h-2" />;
+    }
+
+    // Handle headers with **text**
+    if (line.includes('**') && line.indexOf('**') !== line.lastIndexOf('**')) {
+      const parts = line.split('**');
+      return (
+        <div key={index} className="mb-3">
+          {parts.map((part, partIndex) => {
+            if (partIndex % 2 === 1) {
+              // This is bold text - check if it's a line name for special styling
+              const isLineName = part.includes('Line');
+              
+              if (isLineName) {
+                return (
+                  <h3
+                    key={partIndex}
+                    className="font-bold text-2xl mb-1"
+                    style={{ color: lineColor?.primary || '#333' }}
+                  >
+                    {part}
+                  </h3>
+                );
+              }
+              
+              return (
+                <strong key={partIndex} className="font-semibold text-lg">
+                  {part}
+                </strong>
+              );
+            }
+            return <span key={partIndex}>{part}</span>;
+          })}
+        </div>
+      );
+    }
+
+    // Handle special formatted fields (like "Platform Name:", "Direction:", etc.)
+    if (line.includes(':')) {
+      const [label, ...valueParts] = line.split(':');
+      const value = valueParts.join(':').trim();
+      
+      return (
+        <div key={index} className="mb-2 flex flex-wrap gap-1">
+          <span className="font-semibold text-gray-700">{label}:</span>
+          <span className="text-gray-900">{value}</span>
+        </div>
+      );
+    }
+
+    // Handle bullet points
+    if (line.trim().startsWith('- ')) {
+      return (
+        <div key={index} className="flex items-start gap-2 mb-2 ml-4">
+          <span 
+            className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+            style={{ backgroundColor: lineColor?.primary || '#6b7280' }}
+          ></span>
+          <span className="text-sm">{line.trim().substring(2)}</span>
+        </div>
+      );
+    }
+
+    // Handle numbered lists
+    if (/^\d+\./.test(line.trim())) {
+      return (
+        <div key={index} className="mb-2 ml-4 flex items-start gap-2">
+          <span 
+            className="font-semibold text-sm"
+            style={{ color: lineColor?.primary || '#374151' }}
+          >
+            {line.trim().match(/^\d+\./)[0]}
+          </span>
+          <span className="text-sm">{line.trim().replace(/^\d+\.\s*/, '')}</span>
+        </div>
+      );
+    }
+
+    // Regular paragraphs
+    return (
+      <p key={index} className="mb-2 text-sm leading-relaxed text-gray-800">
+        {line}
+      </p>
+    );
+  });
+};
+
 export default function ChatMessage({ message }) {
   const { getLineColor, getLineInfo } = useTFL();
-
-  // Debug: Log what message object we're receiving
-  console.log('ChatMessage received message:', message);
-  console.log('Message content:', message.content);
-  console.log('Message content type:', typeof message.content);
 
   const isUser = message.role === 'user';
   const isError = message.isError;
@@ -82,44 +184,27 @@ export default function ChatMessage({ message }) {
       )}
 
       <div className={getMessageClasses()}>
-        {getAgentInfo()}{' '}
-        <div className="prose prose-sm max-w-none">
-          {/* Debug: Show exactly what we're working with */}
-          <div className="bg-blue-50 text-blue-800 p-2 rounded mb-2 text-xs">
-            DEBUG: Content type: {typeof message.content} | Content length:{' '}
-            {message.content ? message.content.length : 'undefined'} | Content
-            preview: "
-            {message.content ? message.content.substring(0, 50) : 'UNDEFINED'}
-            "...
-          </div>
-
-          {/* Main content rendering */}
-          {message.content ? (
-            <div className="bg-green-50 p-2 rounded">
-              {message.content.split('\n').map((line, index) => (
-                <p key={index} className="mb-2 last:mb-0">
-                  {line}
-                </p>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-red-50 p-2 rounded">
-              <p className="text-red-600">
-                ERROR: No content available - message.content is:{' '}
-                {String(message.content)}
-              </p>
-            </div>
-          )}
+        {getAgentInfo()}
+        <div className="message-content">
+          {renderFormattedContent(message.content, lineColor)}
         </div>
-        {/* Metadata display - temporarily hidden for debugging */}
-        {false && message.metadata && (
+        {/* TFL Data display */}
+        {message.tflData && (
           <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
             <div className="text-xs font-medium text-gray-700 mb-2">
-              Additional Information:
+              TFL Data:
             </div>
-            <pre className="text-xs text-gray-600 whitespace-pre-wrap">
-              {JSON.stringify(message.metadata, null, 2)}
-            </pre>
+            <div className="text-xs text-gray-600">
+              {message.tflData.line && (
+                <div>Line: {message.tflData.line.name}</div>
+              )}
+              {message.tflData.status && (
+                <div>Status: {message.tflData.status[0]?.statusSeverityDescription}</div>
+              )}
+              {message.tflData.lastUpdated && (
+                <div>Updated: {new Date(message.tflData.lastUpdated).toLocaleTimeString()}</div>
+              )}
+            </div>
           </div>
         )}
         {/* Timestamp */}

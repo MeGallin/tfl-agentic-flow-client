@@ -8,6 +8,72 @@
   scroll-behavior: smooth;
 }
 
+/* Chat message base styles */
+.chat-message {
+  max-width: 75%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.chat-message.user {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.chat-message.assistant {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* TFL Line-specific styling */
+.chat-message.circle {
+  border-left: 4px solid #FFD329;
+  background: #fffbeb;
+}
+
+.chat-message.bakerloo {
+  border-left: 4px solid #894E24;
+  background: #fef7f0;
+}
+
+.chat-message.district {
+  border-left: 4px solid #007934;
+  background: #f0fdf4;
+}
+
+.chat-message.central {
+  border-left: 4px solid #E32017;
+  background: #fef2f2;
+}
+
+/* Message content styling */
+.message-content {
+  line-height: 1.6;
+}
+
+.message-content h3 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.message-content p {
+  margin-bottom: 0.5rem;
+}
+
+.message-content ul {
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content li {
+  margin-bottom: 0.25rem;
+}
+
 /* Custom scrollbar styling */
 .scrollbar-thin {
   scrollbar-width: thin;
