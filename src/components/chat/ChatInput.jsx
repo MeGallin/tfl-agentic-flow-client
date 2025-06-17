@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Lightbulb, X } from 'lucide-react';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
 
 export default function ChatInput() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
   const inputRef = useRef(null);
   const {
     addMessage,
@@ -16,11 +17,44 @@ export default function ChatInput() {
     threadId,
     isLoading,
   } = useConversation();
-
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Example suggestions organized by category
+  const exampleSuggestions = {
+    'Line Status': [
+      "What's the current status of the Circle line?",
+      'Is the District line running normally?',
+      'Any service updates for Bakerloo line?',
+      'Central line service status',
+    ],
+    Disruptions: [
+      'Are there any disruptions on Bakerloo line?',
+      'Current delays on Circle line?',
+      'District line closures this weekend',
+      'Planned engineering works',
+    ],
+    'Journey Planning': [
+      'Plan a journey from Paddington to Westminster',
+      "Best route from King's Cross to Victoria",
+      'How to get from Baker Street to Liverpool Street',
+      'Journey time from Edgware Road to Monument',
+    ],
+    'Station Information': [
+      'District line station information',
+      'Tell me about Notting Hill Gate station',
+      'Platform information for Baker Street',
+      'Accessibility at Westminster station',
+    ],
+  };
+
+  const handleExampleClick = (example) => {
+    setMessage(example);
+    setShowExamples(false);
+    inputRef.current?.focus();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,76 +147,115 @@ export default function ChatInput() {
       handleSubmit(e);
     }
   };
-
   const isDisabled = isSending || isLoading;
   return (
-    <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-        <div className="flex gap-3">
-          <div className="flex-1">
-            <textarea
-              ref={inputRef}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask about Circle, Bakerloo, or District line services..."
-              className="textarea-field min-h-[50px] max-h-[120px] resize-none"
-              disabled={isDisabled}
-              rows={1}
-              style={{
-                height: 'auto',
-                minHeight: '50px',
-              }}
-              onInput={(e) => {
-                e.target.style.height = 'auto';
-                e.target.style.height =
-                  Math.min(e.target.scrollHeight, 120) + 'px';
-              }}
-            />
-          </div>
+    <>
+      {' '}
+      {/* Examples Modal */}
+      {showExamples && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-3 pt-12 sm:p-6">
+          <div className="bg-white rounded-2xl w-full sm:max-w-3xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-200 bg-gray-50">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                Example Questions
+              </h3>
+              <button
+                onClick={() => setShowExamples(false)}
+                className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
 
-          <button
-            type="submit"
-            disabled={isDisabled || !message.trim()}
-            className={`
-              px-4 py-3 rounded-lg font-medium transition-all duration-200
-              flex items-center justify-center min-w-[60px]
-              ${
-                isDisabled || !message.trim()
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-700 text-white hover:shadow-lg'
-              }
-            `}
-          >
-            {isSending ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
-        </div>
-
-        {/* Quick suggestions */}
-        <div className="mt-3 flex flex-wrap gap-2">
-          {[
-            "What's the current status of the Circle line?",
-            'Are there any disruptions on Bakerloo line?',
-            'Plan a journey from Paddington to Westminster',
-            'District line station information',
-          ].map((suggestion, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => setMessage(suggestion)}
-              disabled={isDisabled}
-              className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 
-                         rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            {/* Modal Content */}
+            <div
+              className="p-4 sm:p-5 overflow-y-auto"
+              style={{ maxHeight: 'calc(85vh - 80px)' }}
             >
-              {suggestion}
-            </button>
-          ))}
+              {Object.entries(exampleSuggestions).map(
+                ([category, suggestions]) => (
+                  <div key={category} className="mb-6 last:mb-2">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 px-1 uppercase tracking-wide">
+                      {category}
+                    </h4>
+                    <div className="space-y-2">
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleExampleClick(suggestion)}
+                          className="w-full text-left p-4 text-sm sm:text-base bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors border border-transparent hover:border-blue-200 hover:shadow-sm"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
         </div>
-      </form>
-    </div>
+      )}
+      {/* Compact Input Area */}
+      <div className="bg-white border-t border-gray-200 p-3 sm:p-4 flex-shrink-0">
+        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+          <div className="flex gap-2 sm:gap-3">
+            {/* Examples Button */}
+            <button
+              type="button"
+              onClick={() => setShowExamples(true)}
+              disabled={isDisabled}
+              className="flex-shrink-0 p-2 sm:p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              title="Show example questions"
+            >
+              <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>{' '}
+            {/* Input Field */}
+            <div className="flex-1">
+              <textarea
+                ref={inputRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask about Circle, Bakerloo, or District line services..."
+                className="textarea-field min-h-[64px] sm:min-h-[72px] max-h-[120px] resize-none text-sm sm:text-base"
+                disabled={isDisabled}
+                rows={2}
+                style={{
+                  height: 'auto',
+                  minHeight: window.innerWidth < 640 ? '64px' : '72px',
+                }}
+                onInput={(e) => {
+                  e.target.style.height = 'auto';
+                  e.target.style.height =
+                    Math.min(e.target.scrollHeight, 120) + 'px';
+                }}
+              />
+            </div>
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={isDisabled || !message.trim()}
+              className={`
+                flex-shrink-0 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all duration-200
+                flex items-center justify-center min-w-[50px] sm:min-w-[60px]
+                ${
+                  isDisabled || !message.trim()
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-primary-600 hover:bg-primary-700 text-white hover:shadow-lg'
+                }
+              `}
+            >
+              {isSending ? (
+                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }

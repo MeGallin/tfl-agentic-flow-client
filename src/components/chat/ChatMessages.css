@@ -2,21 +2,39 @@
 .chat-container {
   height: 100%;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1rem;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   position: relative; /* For absolute positioned children */
   scroll-behavior: smooth;
 }
 
+/* Mobile-first responsive padding */
+@media (min-width: 768px) {
+  .chat-container {
+    padding: 1.5rem;
+  }
+}
+
 /* Chat message base styles */
 .chat-message {
-  max-width: 75%;
-  padding: 1rem;
-  border-radius: 0.75rem;
+  max-width: 95%;
+  padding: 0.875rem;
+  border-radius: 1rem;
   margin-bottom: 0.5rem;
   background: white;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .chat-message {
+    max-width: 75%;
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
 }
 
 .chat-message.user {
@@ -30,79 +48,101 @@
   border-color: #d1d5db;
 }
 
-/* TFL Line-specific styling */
+/* TFL Line-specific styling - Mobile optimized */
 .chat-message.circle {
-  border-left: 4px solid #FFD329;
+  border-left: 3px solid #ffd329;
   background: #fffbeb;
 }
 
 .chat-message.bakerloo {
-  border-left: 4px solid #894E24;
+  border-left: 3px solid #894e24;
   background: #fef7f0;
 }
 
 .chat-message.district {
-  border-left: 4px solid #007934;
+  border-left: 3px solid #007934;
   background: #f0fdf4;
 }
 
 .chat-message.central {
-  border-left: 4px solid #E32017;
+  border-left: 3px solid #e32017;
   background: #fef2f2;
 }
 
 .chat-message.northern {
-  border-left: 4px solid #000000;
+  border-left: 3px solid #000000;
   background: #f9fafb;
 }
 
 .chat-message.piccadilly {
-  border-left: 4px solid #003688;
+  border-left: 3px solid #003688;
   background: #f0f9ff;
 }
 
 .chat-message.victoria {
-  border-left: 4px solid #0098D4;
+  border-left: 3px solid #0098d4;
   background: #f0f9ff;
 }
 
 .chat-message.jubilee {
-  border-left: 4px solid #A0A5A9;
+  border-left: 3px solid #a0a5a9;
   background: #f9fafb;
 }
 
 .chat-message.metropolitan {
-  border-left: 4px solid #9B0056;
+  border-left: 3px solid #9b0056;
   background: #fdf2f8;
 }
 
 .chat-message.hammersmith_city {
-  border-left: 4px solid #F3A9BB;
+  border-left: 3px solid #f3a9bb;
   background: #fdf2f8;
 }
 
 .chat-message.waterloo_city {
-  border-left: 4px solid #95CDBA;
+  border-left: 3px solid #95cdba;
   background: #f0fdfa;
 }
 
 .chat-message.elizabeth {
-  border-left: 4px solid #7156A5;
+  border-left: 3px solid #7156a5;
   background: #faf5ff;
 }
 
-/* Message content styling */
+/* Desktop border styling */
+@media (min-width: 768px) {
+  .chat-message.circle,
+  .chat-message.bakerloo,
+  .chat-message.district,
+  .chat-message.central,
+  .chat-message.northern,
+  .chat-message.piccadilly,
+  .chat-message.victoria,
+  .chat-message.jubilee,
+  .chat-message.metropolitan,
+  .chat-message.hammersmith_city,
+  .chat-message.waterloo_city,
+  .chat-message.elizabeth {
+    border-left-width: 4px;
+  }
+}
+
+/* Message content styling - Mobile first */
 .message-content {
-  line-height: 1.6;
+  line-height: 1.5;
+  font-size: 0.875rem;
 }
 
 .message-content h3 {
   margin-bottom: 0.5rem;
   font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.4;
 }
 
 .message-content p {
   margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
 
 .message-content ul {
@@ -112,6 +152,19 @@
 
 .message-content li {
   margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+/* Desktop message content */
+@media (min-width: 768px) {
+  .message-content {
+    line-height: 1.6;
+    font-size: 0.9rem;
+  }
+
+  .message-content h3 {
+    font-size: 1.25rem;
+  }
 }
 
 /* Custom scrollbar styling */
@@ -134,4 +187,56 @@
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Ensure touch targets are at least 44px for accessibility */
+  .chat-message {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Optimize scrolling performance on mobile */
+  .chat-container {
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0); /* Force hardware acceleration */
+  }
+
+  /* Improve text selection on mobile */
+  .message-content {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Better spacing for mobile taps */
+  .chat-message .message-content p,
+  .chat-message .message-content div {
+    padding: 0.125rem 0;
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 640px) and (orientation: landscape) {
+  .chat-container {
+    padding: 0.75rem;
+  }
+
+  .chat-message {
+    padding: 0.75rem;
+  }
+}
+
+/* Very small screens (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .chat-container {
+    padding: 0.75rem;
+  }
+
+  .chat-message {
+    max-width: 98%;
+    padding: 0.75rem;
+  }
 }

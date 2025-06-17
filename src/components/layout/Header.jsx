@@ -40,7 +40,6 @@ export default function Header({ className = '' }) {
 
     getAppInfo();
   }, []);
-
   const getAgentDisplay = () => {
     if (!activeAgent) return null;
 
@@ -49,10 +48,10 @@ export default function Header({ className = '' }) {
 
     return (
       <div
-        className={`flex items-center gap-2 px-3 py-1 rounded-full ${lineColor.bg} ${lineColor.text}`}
+        className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs sm:text-sm font-medium ${lineColor.bg} ${lineColor.text}`}
       >
-        <span className="text-sm font-medium">{lineInfo.icon}</span>
-        <span className="text-sm font-medium">{lineInfo.name} Assistant</span>
+        <span className="text-xs sm:text-sm">{lineInfo.icon}</span>
+        <span>{lineInfo.name}</span>
       </div>
     );
   };
@@ -82,67 +81,42 @@ export default function Header({ className = '' }) {
   };
   return (
     <header
-      className={`bg-white border-b border-gray-200 shadow-sm px-6 py-4 sticky top-0 z-50 ${className}`}
+      className={`bg-white border-b border-gray-200 shadow-sm px-3 sm:px-4 py-2 sm:py-3 sticky top-0 z-50 ${className}`}
     >
       <div className="flex items-center justify-between">
-        {/* Left side - Logo and title */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-tfl-blue rounded-lg">
-              <Train className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                TFL Underground AI Assistant
-              </h1>
-              <p className="text-sm text-gray-600">
-                Circle, Bakerloo, District & Central Lines
-              </p>
-            </div>
+        {/* Left side - Compact logo and title */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 bg-tfl-blue rounded-lg">
+            <Train className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+              TFL AI Assistant
+            </h1>
+            {/* Active agent indicator - Mobile optimized */}
+            {getAgentDisplay()}
+          </div>
+        </div>
 
-          {/* Active agent indicator */}
-          {getAgentDisplay()}
-        </div>{' '}
-        {/* Right side - Status and info */}
-        <div className="flex items-center gap-4">
-          {/* New Conversation Button */}
+        {/* Right side - Compact controls */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* New Chat Button - Mobile optimized */}
           <button
             onClick={clearAllConversations}
-            className="flex items-center gap-2 px-3 py-1 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             title="Start new conversation"
           >
-            <Plus className="w-4 h-4" />
-            New Chat
+            <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">New Chat</span>
           </button>
 
-          {/* Connection status */}
-          <div className="flex items-center gap-2">
+          {/* Connection status - Compact */}
+          <div className="flex items-center gap-1">
             {getConnectionIcon()}
-            <span
-              className={`text-sm font-medium ${
-                connectionStatus === 'connected'
-                  ? 'text-green-600'
-                  : connectionStatus === 'disconnected'
-                  ? 'text-red-600'
-                  : 'text-yellow-600'
-              }`}
-            >
+            <span className="hidden sm:inline text-xs font-medium text-gray-500">
               {getConnectionText()}
             </span>
           </div>
-
-          {/* Thread ID indicator */}
-          {threadId && (
-            <div className="text-xs text-gray-500 font-mono">
-              ID: {threadId.slice(-8)}
-            </div>
-          )}
-
-          {/* App version */}
-          {appInfo && (
-            <div className="text-xs text-gray-500">v{appInfo.version}</div>
-          )}
         </div>
       </div>
     </header>
