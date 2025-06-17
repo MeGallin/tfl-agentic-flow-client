@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* TFL Line Themed Components */
+  .line-circle {
+    @apply bg-circle text-black;
+  }
+
+  .line-bakerloo {
+    @apply bg-bakerloo text-white;
+  }
+
+  .line-district {
+    @apply bg-district text-white;
+  }
+
+  .line-central {
+    @apply bg-central text-white;
+  }
+
+  /* Chat Components */
+  .chat-message {
+    @apply rounded-lg p-4 max-w-3xl animate-slide-up;
+  }
+
+  .chat-message.user {
+    @apply bg-primary-500 text-white ml-auto;
+  }
+
+  .chat-message.assistant {
+    @apply bg-white border border-gray-200 shadow-sm;
+  }
+
+  .chat-message.circle {
+    @apply bg-circle/10 border-circle/20;
+  }
+
+  .chat-message.bakerloo {
+    @apply bg-bakerloo/10 border-bakerloo/20;
+  }
+
+  .chat-message.district {
+    @apply bg-district/10 border-district/20;
+  }
+
+  .chat-message.central {
+    @apply bg-central/10 border-central/20;
+  }
+
+  /* Status Indicators */
+  .status-good {
+    @apply bg-green-100 text-green-800 border-green-200;
+  }
+
+  .status-minor {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  }
+
+  .status-severe {
+    @apply bg-red-100 text-red-800 border-red-200;
+  }
+
+  /* Button Variants */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-circle {
+    @apply bg-circle hover:bg-circle-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-bakerloo {
+    @apply bg-bakerloo hover:bg-bakerloo-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-district {
+    @apply bg-district hover:bg-district-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-central {
+    @apply bg-central hover:bg-central-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  /* Form Components */
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .textarea-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
