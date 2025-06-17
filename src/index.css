@@ -33,6 +33,38 @@
     @apply bg-central text-white;
   }
 
+  .line-northern {
+    @apply bg-northern text-white;
+  }
+
+  .line-piccadilly {
+    @apply bg-piccadilly text-white;
+  }
+
+  .line-victoria {
+    @apply bg-victoria text-white;
+  }
+
+  .line-jubilee {
+    @apply bg-jubilee text-white;
+  }
+
+  .line-metropolitan {
+    @apply bg-metropolitan text-white;
+  }
+
+  .line-hammersmith-city {
+    @apply bg-hammersmith-city text-black;
+  }
+
+  .line-waterloo-city {
+    @apply bg-waterloo-city text-black;
+  }
+
+  .line-elizabeth {
+    @apply bg-elizabeth text-white;
+  }
+
   /* Chat Components */
   .chat-message {
     @apply rounded-lg p-4 max-w-3xl animate-slide-up;
@@ -60,6 +92,38 @@
 
   .chat-message.central {
     @apply bg-central/10 border-central/20;
+  }
+
+  .chat-message.northern {
+    @apply bg-northern/10 border-northern/20;
+  }
+
+  .chat-message.piccadilly {
+    @apply bg-piccadilly/10 border-piccadilly/20;
+  }
+
+  .chat-message.victoria {
+    @apply bg-victoria/10 border-victoria/20;
+  }
+
+  .chat-message.jubilee {
+    @apply bg-jubilee/10 border-jubilee/20;
+  }
+
+  .chat-message.metropolitan {
+    @apply bg-metropolitan/10 border-metropolitan/20;
+  }
+
+  .chat-message.hammersmith_city {
+    @apply bg-hammersmith-city/10 border-hammersmith-city/20;
+  }
+
+  .chat-message.waterloo_city {
+    @apply bg-waterloo-city/10 border-waterloo-city/20;
+  }
+
+  .chat-message.elizabeth {
+    @apply bg-elizabeth/10 border-elizabeth/20;
   }
 
   /* Status Indicators */
@@ -98,6 +162,38 @@
 
   .btn-central {
     @apply bg-central hover:bg-central-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-northern {
+    @apply bg-northern hover:bg-northern-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-piccadilly {
+    @apply bg-piccadilly hover:bg-piccadilly-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-victoria {
+    @apply bg-victoria hover:bg-victoria-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-jubilee {
+    @apply bg-jubilee hover:bg-jubilee-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-metropolitan {
+    @apply bg-metropolitan hover:bg-metropolitan-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-hammersmith-city {
+    @apply bg-hammersmith-city hover:bg-hammersmith-city-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-waterloo-city {
+    @apply bg-waterloo-city hover:bg-waterloo-city-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+  }
+
+  .btn-elizabeth {
+    @apply bg-elizabeth hover:bg-elizabeth-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
   }
 
   /* Form Components */

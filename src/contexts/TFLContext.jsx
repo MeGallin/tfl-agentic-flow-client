@@ -42,6 +42,62 @@ const LINE_COLORS = {
     bg: 'bg-central',
     border: 'border-central',
   },
+  northern: {
+    primary: '#000000',
+    secondary: '#333333',
+    text: 'text-white',
+    bg: 'bg-northern',
+    border: 'border-northern',
+  },
+  piccadilly: {
+    primary: '#003688',
+    secondary: '#002455',
+    text: 'text-white',
+    bg: 'bg-piccadilly',
+    border: 'border-piccadilly',
+  },
+  victoria: {
+    primary: '#0098D4',
+    secondary: '#0077AA',
+    text: 'text-white',
+    bg: 'bg-victoria',
+    border: 'border-victoria',
+  },
+  jubilee: {
+    primary: '#A0A5A9',
+    secondary: '#7D8387',
+    text: 'text-white',
+    bg: 'bg-jubilee',
+    border: 'border-jubilee',
+  },
+  metropolitan: {
+    primary: '#9B0056',
+    secondary: '#7A0044',
+    text: 'text-white',
+    bg: 'bg-metropolitan',
+    border: 'border-metropolitan',
+  },
+  hammersmith_city: {
+    primary: '#F3A9BB',
+    secondary: '#E088A1',
+    text: 'text-black',
+    bg: 'bg-hammersmith-city',
+    border: 'border-hammersmith-city',
+  },
+  waterloo_city: {
+    primary: '#95CDBA',
+    secondary: '#7AB8A3',
+    text: 'text-black',
+    bg: 'bg-waterloo-city',
+    border: 'border-waterloo-city',
+  },
+  elizabeth: {
+    primary: '#7156A5',
+    secondary: '#5A4382',
+    text: 'text-white',
+    bg: 'bg-elizabeth',
+    border: 'border-elizabeth',
+  },
 };
 
 // Line information
@@ -74,6 +130,62 @@ const LINE_INFO = {
     termini: ['West Ruislip', 'Ealing Broadway', 'Epping', 'Hainault'],
     icon: '🔴',
   },
+  northern: {
+    name: 'Northern Line',
+    description: 'North-south through London with Charing Cross and Bank branches',
+    zones: ['1', '2', '3', '4', '5', '6'],
+    termini: ['Morden', 'Edgware', 'High Barnet', 'Mill Hill East'],
+    icon: '⚫',
+  },
+  piccadilly: {
+    name: 'Piccadilly Line',
+    description: 'London\'s longest line serving Heathrow Airport',
+    zones: ['1', '2', '3', '4', '5', '6'],
+    termini: ['Cockfosters', 'Heathrow T2&3', 'Heathrow T4', 'Heathrow T5', 'Uxbridge'],
+    icon: '🔵',
+  },
+  victoria: {
+    name: 'Victoria Line',
+    description: 'High-frequency automated line from North to South London',
+    zones: ['1', '2', '3'],
+    termini: ['Brixton', 'Walthamstow Central'],
+    icon: '🔷',
+  },
+  jubilee: {
+    name: 'Jubilee Line',
+    description: 'Modern line serving Canary Wharf and Greenwich',
+    zones: ['1', '2', '3', '4'],
+    termini: ['Stanmore', 'Stratford'],
+    icon: '🔘',
+  },
+  metropolitan: {
+    name: 'Metropolitan Line',
+    description: 'Historic line extending into Buckinghamshire countryside',
+    zones: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+    termini: ['Aldgate', 'Amersham', 'Chesham', 'Uxbridge', 'Watford'],
+    icon: '🟣',
+  },
+  hammersmith_city: {
+    name: 'Hammersmith & City Line',
+    description: 'Cross-London connector from West to East',
+    zones: ['1', '2', '3', '4', '5', '6'],
+    termini: ['Hammersmith', 'Barking'],
+    icon: '🌸',
+  },
+  waterloo_city: {
+    name: 'Waterloo & City Line',
+    description: 'Business shuttle between Waterloo and Bank (weekdays only)',
+    zones: ['1'],
+    termini: ['Waterloo', 'Bank'],
+    icon: '🔧',
+  },
+  elizabeth: {
+    name: 'Elizabeth Line',
+    description: 'London\'s newest high-capacity cross-city railway',
+    zones: ['1', '2', '3', '4', '5', '6'],
+    termini: ['Reading', 'Heathrow T2&3', 'Heathrow T4', 'Heathrow T5', 'Abbey Wood', 'Shenfield'],
+    icon: '🟪',
+  },
 };
 
 // Initial state
@@ -83,18 +195,42 @@ const initialState = {
     bakerloo: null,
     district: null,
     central: null,
+    northern: null,
+    piccadilly: null,
+    victoria: null,
+    jubilee: null,
+    metropolitan: null,
+    hammersmith_city: null,
+    waterloo_city: null,
+    elizabeth: null,
   },
   disruptions: {
     circle: [],
     bakerloo: [],
     district: [],
     central: [],
+    northern: [],
+    piccadilly: [],
+    victoria: [],
+    jubilee: [],
+    metropolitan: [],
+    hammersmith_city: [],
+    waterloo_city: [],
+    elizabeth: [],
   },
   stations: {
     circle: [],
     bakerloo: [],
     district: [],
     central: [],
+    northern: [],
+    piccadilly: [],
+    victoria: [],
+    jubilee: [],
+    metropolitan: [],
+    hammersmith_city: [],
+    waterloo_city: [],
+    elizabeth: [],
   },
   journeyPlan: null,
   selectedLine: null,
@@ -234,9 +370,21 @@ export function TFLProvider({ children }) {
   };
 
   // Helper functions
-  const getLineColor = (line) => LINE_COLORS[line] || LINE_COLORS.circle;
+  const normalizeAgentName = (agentName) => {
+    if (!agentName) return null;
+    // Convert backend agent names (e.g., 'HAMMERSMITH_CITY') to frontend keys (e.g., 'hammersmith_city')
+    return agentName.toLowerCase();
+  };
 
-  const getLineInfo = (line) => LINE_INFO[line] || LINE_INFO.circle;
+  const getLineColor = (line) => {
+    const normalizedLine = normalizeAgentName(line);
+    return LINE_COLORS[normalizedLine] || LINE_COLORS.circle;
+  };
+
+  const getLineInfo = (line) => {
+    const normalizedLine = normalizeAgentName(line);
+    return LINE_INFO[normalizedLine] || LINE_INFO.circle;
+  };
 
   const getServiceStatus = (line) => {
     const status = state.lineStatus[line];
@@ -266,6 +414,7 @@ export function TFLProvider({ children }) {
       value={{
         ...state,
         ...actions,
+        normalizeAgentName,
         getLineColor,
         getLineInfo,
         getServiceStatus,

@@ -23,6 +23,38 @@ export default {
           DEFAULT: '#E32017',
           dark: '#C71C0C',
         },
+        northern: {
+          DEFAULT: '#000000',
+          dark: '#333333',
+        },
+        piccadilly: {
+          DEFAULT: '#003688',
+          dark: '#002455',
+        },
+        victoria: {
+          DEFAULT: '#0098D4',
+          dark: '#0077AA',
+        },
+        jubilee: {
+          DEFAULT: '#A0A5A9',
+          dark: '#7D8387',
+        },
+        metropolitan: {
+          DEFAULT: '#9B0056',
+          dark: '#7A0044',
+        },
+        'hammersmith-city': {
+          DEFAULT: '#F3A9BB',
+          dark: '#E088A1',
+        },
+        'waterloo-city': {
+          DEFAULT: '#95CDBA',
+          dark: '#7AB8A3',
+        },
+        elizabeth: {
+          DEFAULT: '#7156A5',
+          dark: '#5A4382',
+        },
         // UI Colors
         primary: {
           50: '#eff6ff',

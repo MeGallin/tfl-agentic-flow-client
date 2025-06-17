@@ -51,6 +51,46 @@
   background: #fef2f2;
 }
 
+.chat-message.northern {
+  border-left: 4px solid #000000;
+  background: #f9fafb;
+}
+
+.chat-message.piccadilly {
+  border-left: 4px solid #003688;
+  background: #f0f9ff;
+}
+
+.chat-message.victoria {
+  border-left: 4px solid #0098D4;
+  background: #f0f9ff;
+}
+
+.chat-message.jubilee {
+  border-left: 4px solid #A0A5A9;
+  background: #f9fafb;
+}
+
+.chat-message.metropolitan {
+  border-left: 4px solid #9B0056;
+  background: #fdf2f8;
+}
+
+.chat-message.hammersmith_city {
+  border-left: 4px solid #F3A9BB;
+  background: #fdf2f8;
+}
+
+.chat-message.waterloo_city {
+  border-left: 4px solid #95CDBA;
+  background: #f0fdfa;
+}
+
+.chat-message.elizabeth {
+  border-left: 4px solid #7156A5;
+  background: #faf5ff;
+}
+
 /* Message content styling */
 .message-content {
   line-height: 1.6;
