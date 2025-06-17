@@ -110,7 +110,7 @@ const renderFormattedContent = (content, lineColor) => {
 };
 
 export default function ChatMessage({ message }) {
-  const { getLineColor, getLineInfo } = useTFL();
+  const { getLineColor, getLineInfo, normalizeAgentName } = useTFL();
 
   const isUser = message.role === 'user';
   const isError = message.isError;
@@ -138,7 +138,8 @@ export default function ChatMessage({ message }) {
     }
 
     if (agent) {
-      return `chat-message assistant ${agent}`;
+      const normalizedAgent = normalizeAgentName(agent);
+      return `chat-message assistant ${normalizedAgent}`;
     }
 
     return 'chat-message assistant';
