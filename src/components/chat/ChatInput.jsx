@@ -201,16 +201,17 @@ export default function ChatInput() {
       <div className="bg-white border-t border-gray-200 p-3 sm:p-4 flex-shrink-0">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex gap-2 sm:gap-3">
+            {' '}
             {/* Examples Button */}
             <button
               type="button"
               onClick={() => setShowExamples(true)}
               disabled={isDisabled}
-              className="flex-shrink-0 p-2 sm:p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              className="flex-shrink-0 p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 border border-gray-200 hover:border-blue-300"
               title="Show example questions"
             >
               <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>{' '}
+            </button>
             {/* Input Field */}
             <div className="flex-1">
               <textarea
