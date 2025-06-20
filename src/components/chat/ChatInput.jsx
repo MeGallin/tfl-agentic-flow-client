@@ -86,6 +86,12 @@ export default function ChatInput() {
 
   // Speech recognition handlers
   const startListening = () => {
+    // Check for secure context (HTTPS requirement)
+    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+      setError('Voice recognition requires HTTPS. Please access this site securely.');
+      return;
+    }
+    
     if (!browserSupportsSpeechRecognition) {
       setError('Speech recognition is not supported in this browser');
       return;
