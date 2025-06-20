@@ -12,7 +12,7 @@ body,
   height: 100vh;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent body scrolling */
+  overflow: auto; /* Allow body scrolling */
 }
 
 /* Custom scrollbar for webkit browsers */
