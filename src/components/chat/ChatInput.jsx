@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Lightbulb, X } from 'lucide-react';
+import { Send, Loader2, Lightbulb, X, Mic, MicOff } from 'lucide-react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
 
@@ -17,6 +18,15 @@ export default function ChatInput() {
     threadId,
     isLoading,
   } = useConversation();
+
+  // Speech recognition hook
+  const {
+    transcript,
+    listening,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+    resetTranscript
+  } = useSpeechRecognition();
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
@@ -32,6 +42,13 @@ export default function ChatInput() {
     window.addEventListener('setInputMessage', handleSetInputMessage);
     return () => window.removeEventListener('setInputMessage', handleSetInputMessage);
   }, []);
+
+  // Update message when transcript changes
+  useEffect(() => {
+    if (transcript) {
+      setMessage(transcript);
+    }
+  }, [transcript]);
 
   // Example suggestions organized by category
   const exampleSuggestions = {
@@ -65,6 +82,24 @@ export default function ChatInput() {
     setMessage(example);
     setShowExamples(false);
     inputRef.current?.focus();
+  };
+
+  // Speech recognition handlers
+  const startListening = () => {
+    if (!browserSupportsSpeechRecognition) {
+      setError('Speech recognition is not supported in this browser');
+      return;
+    }
+    if (!isMicrophoneAvailable) {
+      setError('Microphone access is not available. Please check your permissions.');
+      return;
+    }
+    resetTranscript();
+    SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+  };
+
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
   };
 
   const handleSubmit = async (e) => {
@@ -223,6 +258,27 @@ export default function ChatInput() {
             >
               <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
+            
+            {/* Speech Recognition Button */}
+            {browserSupportsSpeechRecognition && (
+              <button
+                type="button"
+                onClick={listening ? stopListening : startListening}
+                disabled={isDisabled}
+                className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
+                  listening
+                    ? 'text-red-400 bg-red-900 border-red-600 hover:bg-red-800 animate-pulse'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+                }`}
+                title={listening ? 'Stop listening' : 'Start voice input'}
+              >
+                {listening ? (
+                  <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                ) : (
+                  <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+                )}
+              </button>
+            )}
             {/* Input Field */}
             <div className="flex-1">
               <textarea
