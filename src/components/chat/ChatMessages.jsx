@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Loader2, ArrowDown, RefreshCw } from 'lucide-react';
 import { useConversation } from '../../contexts/ConversationContext';
 import ChatMessage from './ChatMessage';
+import LineStatusBlock from './LineStatusBlock';
 import { tflService } from '../../services/tflService';
 import './ChatMessages.css';
 
@@ -13,6 +14,22 @@ export default function ChatMessages() {
   const [lineStatuses, setLineStatuses] = useState([]);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // TFL Line configuration data
+  const tflLines = [
+    { id: 'circle', name: 'Circle', backgroundColor: '#FFD300' },
+    { id: 'bakerloo', name: 'Bakerloo', backgroundColor: '#B36305' },
+    { id: 'district', name: 'District', backgroundColor: '#00782A' },
+    { id: 'central', name: 'Central', backgroundColor: '#E32017' },
+    { id: 'northern', name: 'Northern', backgroundColor: '#000000' },
+    { id: 'piccadilly', name: 'Piccadilly', backgroundColor: '#003688' },
+    { id: 'victoria', name: 'Victoria', backgroundColor: '#0098D4' },
+    { id: 'jubilee', name: 'Jubilee', backgroundColor: '#A0A5A9' },
+    { id: 'metropolitan', name: 'Metropolitan', backgroundColor: '#9B0056' },
+    { id: 'hammersmith-city', name: 'H&C', backgroundColor: '#F3A9BB' },
+    { id: 'waterloo-city', name: 'W&C', backgroundColor: '#95CDBA' },
+    { id: 'elizabeth', name: 'Elizabeth', backgroundColor: '#7156A5' }
+  ];
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -191,78 +208,16 @@ export default function ChatMessages() {
                   </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#FFD300'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Circle</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('circle')}`}>{getLineStatus('circle')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#B36305'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Bakerloo</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('bakerloo')}`}>{getLineStatus('bakerloo')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#00782A'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>District</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('district')}`}>{getLineStatus('district')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#E32017'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Central</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('central')}`}>{getLineStatus('central')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#000000'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Northern</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('northern')}`}>{getLineStatus('northern')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#003688'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Piccadilly</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('piccadilly')}`}>{getLineStatus('piccadilly')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#0098D4'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Victoria</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('victoria')}`}>{getLineStatus('victoria')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#A0A5A9'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Jubilee</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('jubilee')}`}>{getLineStatus('jubilee')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#9B0056'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Metropolitan</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('metropolitan')}`}>{getLineStatus('metropolitan')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#F3A9BB'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>H&C</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('hammersmith-city')}`}>{getLineStatus('hammersmith-city')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#95CDBA'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>W&C</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('waterloo-city')}`}>{getLineStatus('waterloo-city')}</span>
-                  </div>
-                  <div className="flex flex-col items-center p-2 sm:p-3 border border-gray-600" style={{backgroundColor: '#7156A5'}}>
-                    <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-base sm:text-lg font-medium text-white">
-                      <span>Elizabeth</span>
-                    </span>
-                    <span className={`text-xs mt-1 text-center px-2 py-1 bg-gray-100 border border-gray-200 ${getStatusStyling('elizabeth')}`}>{getLineStatus('elizabeth')}</span>
-                  </div>
+                  {tflLines.map((line) => (
+                    <LineStatusBlock
+                      key={line.id}
+                      lineId={line.id}
+                      lineName={line.name}
+                      backgroundColor={line.backgroundColor}
+                      getLineStatus={getLineStatus}
+                      getStatusStyling={getStatusStyling}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
