@@ -98,6 +98,13 @@ const LINE_COLORS = {
     bg: 'bg-elizabeth',
     border: 'border-elizabeth',
   },
+  status: {
+    primary: '#374151',
+    secondary: '#1F2937',
+    text: 'text-white',
+    bg: 'bg-gray-600',
+    border: 'border-gray-600',
+  },
 };
 
 // Line information
@@ -186,6 +193,13 @@ const LINE_INFO = {
     termini: ['Reading', 'Heathrow T2&3', 'Heathrow T4', 'Heathrow T5', 'Abbey Wood', 'Shenfield'],
     icon: '🟪',
   },
+  status: {
+    name: 'Network Status',
+    description: 'London Underground network-wide service information',
+    zones: ['All'],
+    termini: ['Network-wide coverage'],
+    icon: '📊',
+  },
 };
 
 // Initial state
@@ -203,6 +217,7 @@ const initialState = {
     hammersmith_city: null,
     waterloo_city: null,
     elizabeth: null,
+    status: null,
   },
   disruptions: {
     circle: [],
@@ -217,6 +232,7 @@ const initialState = {
     hammersmith_city: [],
     waterloo_city: [],
     elizabeth: [],
+    status: [],
   },
   stations: {
     circle: [],
@@ -231,6 +247,7 @@ const initialState = {
     hammersmith_city: [],
     waterloo_city: [],
     elizabeth: [],
+    status: [],
   },
   journeyPlan: null,
   selectedLine: null,
