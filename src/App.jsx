@@ -10,7 +10,7 @@ function App() {
   return (
     <ConversationProvider>
       <TFLProvider>
-        <div className="h-screen overflow-hidden bg-gray-50 flex flex-col">
+        <div className="h-screen overflow-hidden flex flex-col" style={{background: 'rgba(51,51,51,1)'}}>
           <Header />
 
           <main className="flex-1 flex flex-col overflow-hidden">

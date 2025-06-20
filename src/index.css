@@ -7,11 +7,14 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    @apply font-sans antialiased;
+    background: rgba(51,51,51,1);
+    color: #e5e7eb;
   }
 
   html {
     scroll-behavior: smooth;
+    background: rgba(51,51,51,1);
   }
 }
 
@@ -71,7 +74,7 @@
 
   /* Chat Components */
   .chat-message {
-    @apply rounded-lg p-4 max-w-3xl animate-slide-up;
+    @apply  p-4 max-w-3xl animate-slide-up;
   }
 
   .chat-message.user {
@@ -79,7 +82,7 @@
   }
 
   .chat-message.assistant {
-    @apply bg-white border border-gray-200 shadow-sm;
+    @apply bg-gray-800 border border-gray-700 shadow-sm text-gray-100;
   }
 
   .chat-message.circle {
@@ -149,68 +152,68 @@
 
   /* Button Variants */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium px-4 py-2  transition-colors;
   }
 
   .btn-circle {
-    @apply bg-circle hover:bg-circle-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-circle hover:bg-circle-dark text-black font-medium px-4 py-2  transition-colors;
   }
 
   .btn-bakerloo {
-    @apply bg-bakerloo hover:bg-bakerloo-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-bakerloo hover:bg-bakerloo-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-district {
-    @apply bg-district hover:bg-district-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-district hover:bg-district-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-central {
-    @apply bg-central hover:bg-central-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-central hover:bg-central-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-northern {
-    @apply bg-northern hover:bg-northern-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-northern hover:bg-northern-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-piccadilly {
-    @apply bg-piccadilly hover:bg-piccadilly-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-piccadilly hover:bg-piccadilly-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-victoria {
-    @apply bg-victoria hover:bg-victoria-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-victoria hover:bg-victoria-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-jubilee {
-    @apply bg-jubilee hover:bg-jubilee-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-jubilee hover:bg-jubilee-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-metropolitan {
-    @apply bg-metropolitan hover:bg-metropolitan-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-metropolitan hover:bg-metropolitan-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   .btn-hammersmith-city {
-    @apply bg-hammersmith-city hover:bg-hammersmith-city-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-hammersmith-city hover:bg-hammersmith-city-dark text-black font-medium px-4 py-2  transition-colors;
   }
 
   .btn-waterloo-city {
-    @apply bg-waterloo-city hover:bg-waterloo-city-dark text-black font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-waterloo-city hover:bg-waterloo-city-dark text-black font-medium px-4 py-2  transition-colors;
   }
 
   .btn-elizabeth {
-    @apply bg-elizabeth hover:bg-elizabeth-dark text-white font-medium px-4 py-2 rounded-lg transition-colors;
+    @apply bg-elizabeth hover:bg-elizabeth-dark text-white font-medium px-4 py-2  transition-colors;
   }
 
   /* Form Components */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-gray-600  focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-700 text-gray-100;
   }
 
   .textarea-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none;
+    @apply w-full px-3 py-2 border border-gray-600  focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none bg-gray-700 text-gray-100;
   }
 }
 

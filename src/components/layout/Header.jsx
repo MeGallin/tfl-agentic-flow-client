@@ -48,7 +48,7 @@ export default function Header({ className = '' }) {
 
     return (
       <div
-        className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs sm:text-sm font-medium ${lineColor.bg} ${lineColor.text}`}
+        className={`flex items-center gap-1 px-2 py-0.5  text-xs sm:text-sm font-medium ${lineColor.bg} ${lineColor.text}`}
       >
         <span className="text-xs sm:text-sm">{lineInfo.icon}</span>
         <span>{lineInfo.name}</span>
@@ -81,16 +81,16 @@ export default function Header({ className = '' }) {
   };
   return (
     <header
-      className={`bg-white border-b border-gray-200 shadow-sm px-3 sm:px-4 py-2 sm:py-3 sticky top-0 z-50 ${className}`}
+      className={`bg-gray-800 border-b border-gray-700 shadow-sm px-3 sm:px-4 py-2 sm:py-3 sticky top-0 z-50 ${className}`}
     >
       <div className="flex items-center justify-between">
         {/* Left side - Compact logo and title */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="p-1.5 sm:p-2 bg-tfl-blue rounded-lg">
+          <div className="p-1.5 sm:p-2 bg-tfl-blue ">
             <Train className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-100">
               TFL AI Assistant
             </h1>
             {/* Active agent indicator - Mobile optimized */}
@@ -103,7 +103,7 @@ export default function Header({ className = '' }) {
           {/* New Chat Button - Mobile optimized */}
           <button
             onClick={clearAllConversations}
-            className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-gray-300 hover:text-gray-100 hover:bg-gray-700 rounded-md transition-colors"
             title="Start new conversation"
           >
             <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -113,7 +113,7 @@ export default function Header({ className = '' }) {
           {/* Connection status - Compact */}
           <div className="flex items-center gap-1">
             {getConnectionIcon()}
-            <span className="hidden sm:inline text-xs font-medium text-gray-500">
+            <span className="hidden sm:inline text-xs font-medium text-gray-400">
               {getConnectionText()}
             </span>
           </div>

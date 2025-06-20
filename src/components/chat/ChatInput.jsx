@@ -22,6 +22,17 @@ export default function ChatInput() {
     inputRef.current?.focus();
   }, []);
 
+  // Listen for custom events to set input message
+  useEffect(() => {
+    const handleSetInputMessage = (event) => {
+      setMessage(event.detail.message);
+      inputRef.current?.focus();
+    };
+
+    window.addEventListener('setInputMessage', handleSetInputMessage);
+    return () => window.removeEventListener('setInputMessage', handleSetInputMessage);
+  }, []);
+
   // Example suggestions organized by category
   const exampleSuggestions = {
     'Line Status': [
@@ -154,17 +165,17 @@ export default function ChatInput() {
       {/* Examples Modal */}
       {showExamples && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-3 pt-12 sm:p-6">
-          <div className="bg-white rounded-2xl w-full sm:max-w-3xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
+          <div className="bg-gray-800  w-full sm:max-w-3xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-200 bg-gray-50">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-600 bg-gray-700">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-100">
                 Example Questions
               </h3>
               <button
                 onClick={() => setShowExamples(false)}
-                className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                className="p-1.5 hover:bg-gray-600 rounded-md transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-gray-300" />
               </button>
             </div>
 
@@ -176,7 +187,7 @@ export default function ChatInput() {
               {Object.entries(exampleSuggestions).map(
                 ([category, suggestions]) => (
                   <div key={category} className="mb-6 last:mb-2">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3 px-1 uppercase tracking-wide">
+                    <h4 className="text-sm font-medium text-gray-300 mb-3 px-1 uppercase tracking-wide">
                       {category}
                     </h4>
                     <div className="space-y-2">
@@ -184,7 +195,7 @@ export default function ChatInput() {
                         <button
                           key={index}
                           onClick={() => handleExampleClick(suggestion)}
-                          className="w-full text-left p-4 text-sm sm:text-base bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors border border-transparent hover:border-blue-200 hover:shadow-sm"
+                          className="w-full text-left p-4 text-sm sm:text-base bg-gray-700 hover:bg-gray-600 rounded-md transition-colors border border-gray-600 hover:border-gray-500 hover:shadow-sm text-gray-100"
                         >
                           {suggestion}
                         </button>
@@ -198,7 +209,7 @@ export default function ChatInput() {
         </div>
       )}
       {/* Compact Input Area */}
-      <div className="bg-white border-t border-gray-200 p-3 sm:p-4 flex-shrink-0">
+      <div className="bg-gray-800 border-t border-gray-700 p-3 sm:p-4 flex-shrink-0">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
           <div className="flex gap-2 sm:gap-3">
             {' '}
@@ -207,7 +218,7 @@ export default function ChatInput() {
               type="button"
               onClick={() => setShowExamples(true)}
               disabled={isDisabled}
-              className="flex-shrink-0 p-2 sm:p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 border border-gray-200 hover:border-blue-300"
+              className="flex-shrink-0 p-2 sm:p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 border border-gray-600 hover:border-gray-500"
               title="Show example questions"
             >
               <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -219,8 +230,8 @@ export default function ChatInput() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about Circle, Bakerloo, or District line services..."
-                className="textarea-field min-h-[64px] sm:min-h-[72px] max-h-[120px] resize-none text-sm sm:text-base"
+                placeholder="Ask about any TFL line, station, journey planning, or service updates..."
+                className="textarea-field min-h-[64px] sm:min-h-[72px] max-h-[120px] resize-none text-sm sm:text-base bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 flex items-center justify-center text-center"
                 disabled={isDisabled}
                 rows={2}
                 style={{
@@ -239,7 +250,7 @@ export default function ChatInput() {
               type="submit"
               disabled={isDisabled || !message.trim()}
               className={`
-                flex-shrink-0 px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all duration-200
+                flex-shrink-0 px-3 sm:px-4 py-2 sm:py-3 rounded-md font-medium transition-all duration-200
                 flex items-center justify-center min-w-[50px] sm:min-w-[60px]
                 ${
                   isDisabled || !message.trim()

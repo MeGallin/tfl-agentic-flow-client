@@ -72,8 +72,8 @@ const renderFormattedContent = (content, lineColor) => {
           key={index}
           className="mb-2 flex flex-col sm:flex-row sm:flex-wrap gap-1"
         >
-          <span className="font-semibold text-gray-700 text-sm">{label}:</span>
-          <span className="text-gray-900 text-sm break-words">{value}</span>
+          <span className="font-semibold text-gray-300 text-sm">{label}:</span>
+          <span className="text-gray-100 text-sm break-words">{value}</span>
         </div>
       );
     }
@@ -83,7 +83,7 @@ const renderFormattedContent = (content, lineColor) => {
       return (
         <div key={index} className="flex items-start gap-2 mb-2 ml-2 sm:ml-4">
           <span
-            className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mt-2 flex-shrink-0"
+            className="w-1.5 h-1.5 sm:w-2 sm:h-2  mt-2 flex-shrink-0"
             style={{ backgroundColor: lineColor?.primary || '#6b7280' }}
           ></span>
           <span className="text-sm leading-relaxed break-words">
@@ -114,7 +114,7 @@ const renderFormattedContent = (content, lineColor) => {
     return (
       <p
         key={index}
-        className="mb-2 text-sm leading-relaxed text-gray-800 break-words"
+        className="mb-2 text-sm leading-relaxed text-gray-200 break-words"
       >
         {line}
       </p>
@@ -147,7 +147,7 @@ export default function ChatMessage({ message }) {
     }
 
     if (isError) {
-      return 'chat-message assistant bg-red-50 border-red-200';
+      return 'chat-message assistant bg-red-900 border-red-700 text-red-100';
     }
 
     if (agent) {
@@ -192,7 +192,7 @@ export default function ChatMessage({ message }) {
       {!isUser && (
         <div
           className={`
-          flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center
+          flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8  flex items-center justify-center
           ${agent ? lineColor.bg : 'bg-gray-200'}
           ${agent ? lineColor.text : 'text-gray-600'}
         `}
@@ -208,11 +208,11 @@ export default function ChatMessage({ message }) {
         </div>
         {/* TFL Data display */}
         {message.tflData && (
-          <div className="mt-3 p-2 sm:p-3 bg-gray-50 rounded-lg border">
-            <div className="text-xs font-medium text-gray-700 mb-2">
+          <div className="mt-3 p-2 sm:p-3 bg-gray-700  border border-gray-600">
+            <div className="text-xs font-medium text-gray-300 mb-2">
               TFL Data:
             </div>
-            <div className="text-xs text-gray-600 space-y-1">
+            <div className="text-xs text-gray-400 space-y-1">
               {message.tflData.line && (
                 <div className="break-words">
                   Line: {message.tflData.line.name}
@@ -233,14 +233,14 @@ export default function ChatMessage({ message }) {
           </div>
         )}
         {/* Timestamp */}
-        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+        <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
           <Clock className="w-3 h-3 flex-shrink-0" />
           <span>{formatTime(message.timestamp)}</span>
         </div>
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-600 text-white flex items-center justify-center">
+        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8  bg-primary-600 text-white flex items-center justify-center">
           {getIcon()}
         </div>
       )}
