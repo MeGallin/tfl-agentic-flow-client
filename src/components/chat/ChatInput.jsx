@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Lightbulb, X, Mic, MicOff } from 'lucide-react';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import useWhisperSpeechRecognition from '../../hooks/useWhisperSpeechRecognition';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
 
@@ -19,14 +19,25 @@ export default function ChatInput() {
     isLoading,
   } = useConversation();
 
-  // Speech recognition hook
+  // Whisper speech recognition hook
   const {
     transcript,
     listening,
+    isLoading: speechLoading,
+    error: speechError,
     browserSupportsSpeechRecognition,
     isMicrophoneAvailable,
+    startListening: whisperStart,
+    stopListening: whisperStop,
     resetTranscript
-  } = useSpeechRecognition();
+  } = useWhisperSpeechRecognition();
+
+  // Handle speech recognition errors - only log, don't set error to prevent loops
+  useEffect(() => {
+    if (speechError) {
+      console.error('Speech recognition error:', speechError);
+    }
+  }, [speechError]);
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
@@ -85,13 +96,7 @@ export default function ChatInput() {
   };
 
   // Speech recognition handlers
-  const startListening = () => {
-    // Check for secure context (HTTPS requirement)
-    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
-      setError('Voice recognition requires HTTPS. Please access this site securely.');
-      return;
-    }
-    
+  const startListening = async () => {
     if (!browserSupportsSpeechRecognition) {
       setError('Speech recognition is not supported in this browser');
       return;
@@ -101,11 +106,11 @@ export default function ChatInput() {
       return;
     }
     resetTranscript();
-    SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+    await whisperStart({ continuous: true });
   };
 
   const stopListening = () => {
-    SpeechRecognition.stopListening();
+    whisperStop();
   };
 
   const handleSubmit = async (e) => {
@@ -193,7 +198,7 @@ export default function ChatInput() {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -270,15 +275,25 @@ export default function ChatInput() {
               <button
                 type="button"
                 onClick={listening ? stopListening : startListening}
-                disabled={isDisabled}
+                disabled={isDisabled || speechLoading}
                 className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
                   listening
                     ? 'text-red-400 bg-red-900 border-red-600 hover:bg-red-800 animate-pulse'
+                    : speechLoading
+                    ? 'text-blue-400 bg-blue-900 border-blue-600'
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
                 }`}
-                title={listening ? 'Stop listening' : 'Start voice input'}
+                title={
+                  speechLoading 
+                    ? 'Loading speech recognition...' 
+                    : listening 
+                    ? 'Stop listening' 
+                    : 'Start voice input'
+                }
               >
-                {listening ? (
+                {speechLoading ? (
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                ) : listening ? (
                   <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
                   <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -291,7 +306,7 @@ export default function ChatInput() {
                 ref={inputRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 placeholder="Ask about any TFL line, station, journey planning, or service updates..."
                 className="textarea-field min-h-[64px] sm:min-h-[72px] max-h-[120px] resize-none text-sm sm:text-base bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 flex items-center justify-center text-center"
                 disabled={isDisabled}
