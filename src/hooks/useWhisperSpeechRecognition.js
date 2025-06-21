@@ -1,5 +1,24 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { pipeline } from '@xenova/transformers';
+
+// Gracefully handle transformers dependency
+let pipeline = null;
+
+const loadTransformers = async () => {
+  if (typeof window === 'undefined') return null; // Server-side rendering check
+  
+  if (!pipeline) {
+    try {
+      console.log('Attempting to load transformers...');
+      const transformers = await import('@xenova/transformers');
+      pipeline = transformers.pipeline;
+      console.log('Transformers loaded successfully');
+    } catch (error) {
+      console.warn('Transformers library not available or failed to load:', error.message);
+      return null;
+    }
+  }
+  return pipeline;
+};
 
 const useWhisperSpeechRecognition = () => {
   const [transcript, setTranscript] = useState('');
@@ -8,6 +27,7 @@ const useWhisperSpeechRecognition = () => {
   const [error, setError] = useState(null);
   const [browserSupportsRecognition, setBrowserSupportsRecognition] = useState(false);
   const [isMicrophoneAvailable, setIsMicrophoneAvailable] = useState(false);
+  const [isWhisperAvailable, setIsWhisperAvailable] = useState(false);
   
   const mediaRecorderRef = useRef(null);
   const audioStreamRef = useRef(null);
@@ -15,8 +35,26 @@ const useWhisperSpeechRecognition = () => {
   const transcribeRef = useRef(null);
   const isInitializedRef = useRef(false);
 
+  // Check if Whisper is available on component mount
+  useEffect(() => {
+    const checkWhisperAvailability = async () => {
+      const transformersPipeline = await loadTransformers();
+      setIsWhisperAvailable(!!transformersPipeline);
+      if (!transformersPipeline) {
+        setError('Advanced speech recognition (Whisper) not available. Consider using basic speech recognition.');
+      }
+    };
+    
+    checkWhisperAvailability();
+  }, []);
+
   const initializeTranscriber = useCallback(async () => {
     if (isInitializedRef.current || transcribeRef.current) return transcribeRef.current;
+    
+    if (!isWhisperAvailable) {
+      console.warn('Whisper not available, skipping initialization');
+      return null;
+    }
     
     try {
       setIsLoading(true);
@@ -24,17 +62,26 @@ const useWhisperSpeechRecognition = () => {
       
       console.log('Loading Whisper model... This may take a moment on first use.');
       
+      // Try to load transformers
+      const pipelineFunc = await loadTransformers();
+      if (!pipelineFunc) {
+        throw new Error('Transformers library not available');
+      }
+      
       // Add timeout for model loading
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Model loading timeout')), 30000)
+        setTimeout(() => reject(new Error('Model loading timeout after 45 seconds')), 45000)
       );
       
-      const modelPromise = pipeline(
+      const modelPromise = pipelineFunc(
         'automatic-speech-recognition',
         'Xenova/whisper-tiny.en',
         {
           chunk_length_s: 30,
           stride_length_s: 5,
+          // Use the Hugging Face Hub directly instead of local models
+          local_files_only: false,
+          cache_dir: null,
         }
       );
       
@@ -46,23 +93,23 @@ const useWhisperSpeechRecognition = () => {
       return pipe;
     } catch (err) {
       console.error('Failed to initialize Whisper:', err);
-      // Disable speech recognition if model fails to load
-      setBrowserSupportsRecognition(false);
-      setError('Speech recognition unavailable - model failed to load');
+      // Don't completely disable speech recognition, just mark as unavailable for now
+      setError('Advanced speech recognition unavailable. Consider using basic speech input.');
       transcribeRef.current = null;
       isInitializedRef.current = false;
+      setIsWhisperAvailable(false);
       return null;
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isWhisperAvailable]);
 
   const checkBrowserSupport = useCallback(async () => {
     const hasMediaDevices = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
     const hasWebAssembly = typeof WebAssembly === 'object';
     
-    // Initially set support based on basic requirements
-    setBrowserSupportsRecognition(hasMediaDevices && hasWebAssembly);
+    // Set support based on basic requirements and Whisper availability
+    setBrowserSupportsRecognition(hasMediaDevices && hasWebAssembly && isWhisperAvailable);
     
     if (hasMediaDevices) {
       try {
@@ -76,7 +123,7 @@ const useWhisperSpeechRecognition = () => {
     } else {
       setBrowserSupportsRecognition(false);
     }
-  }, []);
+  }, [isWhisperAvailable]);
 
   useEffect(() => {
     checkBrowserSupport();
@@ -115,8 +162,8 @@ const useWhisperSpeechRecognition = () => {
   }, [initializeTranscriber]);
 
   const startListening = useCallback(async ({ continuous = true } = {}) => {
-    if (!browserSupportsRecognition) {
-      setError('Speech recognition not supported in this browser');
+    if (!browserSupportsRecognition || !isWhisperAvailable) {
+      setError('Advanced speech recognition not available. Please type your message.');
       return;
     }
 
@@ -126,14 +173,18 @@ const useWhisperSpeechRecognition = () => {
     }
 
     try {
-      // Initialize transcriber before starting
+      // Try to initialize transcriber before starting
       if (!transcribeRef.current) {
         console.log('Initializing Whisper model...');
+        setIsLoading(true);
         const transcriber = await initializeTranscriber();
         if (!transcriber) {
-          setError('Failed to load speech recognition model');
+          // If Whisper fails to load, show a more user-friendly message
+          setError('Advanced speech recognition temporarily unavailable. Please type your message.');
+          setIsLoading(false);
           return;
         }
+        setIsLoading(false);
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -181,8 +232,9 @@ const useWhisperSpeechRecognition = () => {
     } catch (err) {
       console.error('Failed to start recording:', err);
       setError('Failed to access microphone: ' + err.message);
+      setIsLoading(false);
     }
-  }, [browserSupportsRecognition, isMicrophoneAvailable, processAudioData, initializeTranscriber]);
+  }, [browserSupportsRecognition, isMicrophoneAvailable, processAudioData, initializeTranscriber, isWhisperAvailable]);
 
   const stopListening = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {

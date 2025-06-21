@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Lightbulb, X, Mic, MicOff } from 'lucide-react';
-import useWhisperSpeechRecognition from '../../hooks/useWhisperSpeechRecognition';
+import useSpeechRecognition from '../../hooks/useSpeechRecognition';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
 
@@ -19,7 +19,7 @@ export default function ChatInput() {
     isLoading,
   } = useConversation();
 
-  // Whisper speech recognition hook
+  // Speech recognition hook - using Web Speech API for better reliability
   const {
     transcript,
     listening,
@@ -27,15 +27,16 @@ export default function ChatInput() {
     error: speechError,
     browserSupportsSpeechRecognition,
     isMicrophoneAvailable,
-    startListening: whisperStart,
-    stopListening: whisperStop,
+    startListening: speechStart,
+    stopListening: speechStop,
     resetTranscript
-  } = useWhisperSpeechRecognition();
+  } = useSpeechRecognition();
 
   // Handle speech recognition errors - only log, don't set error to prevent loops
   useEffect(() => {
     if (speechError) {
       console.error('Speech recognition error:', speechError);
+      // Don't set global error state to prevent error loops
     }
   }, [speechError]);
   // Focus input on mount
@@ -98,19 +99,21 @@ export default function ChatInput() {
   // Speech recognition handlers
   const startListening = async () => {
     if (!browserSupportsSpeechRecognition) {
-      setError('Speech recognition is not supported in this browser');
+      // Show a temporary notification instead of setting global error
+      console.warn('Speech recognition is not supported in this browser');
       return;
     }
     if (!isMicrophoneAvailable) {
-      setError('Microphone access is not available. Please check your permissions.');
+      // Show a temporary notification instead of setting global error
+      console.warn('Microphone access is not available. Please check your permissions.');
       return;
     }
     resetTranscript();
-    await whisperStart({ continuous: true });
+    await speechStart({ continuous: true });
   };
 
   const stopListening = () => {
-    whisperStop();
+    speechStop();
   };
 
   const handleSubmit = async (e) => {
