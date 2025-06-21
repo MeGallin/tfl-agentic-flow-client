@@ -99,11 +99,11 @@ const LINE_COLORS = {
     border: 'border-elizabeth',
   },
   status: {
-    primary: '#374151',
-    secondary: '#1F2937',
+    primary: '#3B82F6',
+    secondary: '#2563EB',
     text: 'text-white',
-    bg: 'bg-gray-600',
-    border: 'border-gray-600',
+    bg: 'bg-blue-600',
+    border: 'border-blue-600',
   },
 };
 
@@ -139,16 +139,23 @@ const LINE_INFO = {
   },
   northern: {
     name: 'Northern Line',
-    description: 'North-south through London with Charing Cross and Bank branches',
+    description:
+      'North-south through London with Charing Cross and Bank branches',
     zones: ['1', '2', '3', '4', '5', '6'],
     termini: ['Morden', 'Edgware', 'High Barnet', 'Mill Hill East'],
     icon: '⚫',
   },
   piccadilly: {
     name: 'Piccadilly Line',
-    description: 'London\'s longest line serving Heathrow Airport',
+    description: "London's longest line serving Heathrow Airport",
     zones: ['1', '2', '3', '4', '5', '6'],
-    termini: ['Cockfosters', 'Heathrow T2&3', 'Heathrow T4', 'Heathrow T5', 'Uxbridge'],
+    termini: [
+      'Cockfosters',
+      'Heathrow T2&3',
+      'Heathrow T4',
+      'Heathrow T5',
+      'Uxbridge',
+    ],
     icon: '🔵',
   },
   victoria: {
@@ -188,17 +195,25 @@ const LINE_INFO = {
   },
   elizabeth: {
     name: 'Elizabeth Line',
-    description: 'London\'s newest high-capacity cross-city railway',
+    description: "London's newest high-capacity cross-city railway",
     zones: ['1', '2', '3', '4', '5', '6'],
-    termini: ['Reading', 'Heathrow T2&3', 'Heathrow T4', 'Heathrow T5', 'Abbey Wood', 'Shenfield'],
+    termini: [
+      'Reading',
+      'Heathrow T2&3',
+      'Heathrow T4',
+      'Heathrow T5',
+      'Abbey Wood',
+      'Shenfield',
+    ],
     icon: '🟪',
   },
   status: {
-    name: 'Network Status',
-    description: 'London Underground network-wide service information',
+    name: 'Network Status Assistant',
+    description:
+      'London Underground network-wide service information and disruption updates',
     zones: ['All'],
     termini: ['Network-wide coverage'],
-    icon: '📊',
+    icon: '�',
   },
 };
 

@@ -19,7 +19,7 @@
 .chat-message {
   max-width: 95%;
   padding: 0.875rem;
-    margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
   background: #374151;
   border: 1px solid #4b5563;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
@@ -33,7 +33,7 @@
   .chat-message {
     max-width: 75%;
     padding: 1rem;
-      }
+  }
 }
 
 .chat-message.user {
@@ -51,74 +51,81 @@
 /* TFL Line-specific styling - Mobile optimized */
 .chat-message.circle {
   border-left: 3px solid #ffd329;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.bakerloo {
   border-left: 3px solid #894e24;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.district {
   border-left: 3px solid #007934;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.central {
   border-left: 3px solid #e32017;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.northern {
   border-left: 3px solid #000000;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.piccadilly {
   border-left: 3px solid #003688;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.victoria {
   border-left: 3px solid #0098d4;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.jubilee {
   border-left: 3px solid #a0a5a9;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.metropolitan {
   border-left: 3px solid #9b0056;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.hammersmith_city {
   border-left: 3px solid #f3a9bb;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.waterloo_city {
   border-left: 3px solid #95cdba;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
 }
 
 .chat-message.elizabeth {
   border-left: 3px solid #7156a5;
-  background: rgba(51,51,51,0.8);
+  background: rgba(51, 51, 51, 0.8);
   color: #e5e7eb;
+}
+
+.chat-message.status {
+  border-left: 3px solid #3b82f6;
+  background: rgba(30, 41, 59, 0.9);
+  color: #e5e7eb;
+  border: 1px solid #3b82f6;
 }
 
 /* Desktop border styling */
@@ -134,7 +141,8 @@
   .chat-message.metropolitan,
   .chat-message.hammersmith_city,
   .chat-message.waterloo_city,
-  .chat-message.elizabeth {
+  .chat-message.elizabeth,
+  .chat-message.status {
     border-left-width: 4px;
   }
 }
@@ -194,7 +202,7 @@
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background: #6b7280;
-  }
+}
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;

@@ -8,13 +8,22 @@ const stripHtmlTags = (str) => {
 };
 
 // Utility function to render markdown-like formatting
-const renderFormattedContent = (content, lineColor) => {
+const renderFormattedContent = (
+  content,
+  lineColor,
+  isNetworkStatus = false,
+) => {
   if (!content || typeof content !== 'string') {
     return <span className="text-red-500">No content available</span>;
   }
 
   // Strip any HTML tags first for security and cleanliness
   const cleanContent = stripHtmlTags(content);
+
+  // Special handling for Network Status messages
+  if (isNetworkStatus) {
+    return renderNetworkStatusContent(cleanContent, lineColor);
+  }
 
   // Split content into lines and process each line
   const lines = cleanContent.split('\n');
@@ -23,6 +32,45 @@ const renderFormattedContent = (content, lineColor) => {
     // Skip empty lines
     if (!line.trim()) {
       return <div key={index} className="h-2" />;
+    }
+
+    // Handle markdown headers (### Header)
+    if (line.trim().startsWith('###')) {
+      const headerText = line.trim().replace(/^###\s*/, '');
+      return (
+        <h3
+          key={index}
+          className="font-bold text-lg sm:text-xl mb-3 mt-4 text-blue-400 break-words"
+        >
+          {headerText}
+        </h3>
+      );
+    }
+
+    // Handle markdown headers (## Header)
+    if (line.trim().startsWith('##')) {
+      const headerText = line.trim().replace(/^##\s*/, '');
+      return (
+        <h2
+          key={index}
+          className="font-bold text-xl sm:text-2xl mb-3 mt-4 text-blue-300 break-words"
+        >
+          {headerText}
+        </h2>
+      );
+    }
+
+    // Handle markdown headers (# Header)
+    if (line.trim().startsWith('#')) {
+      const headerText = line.trim().replace(/^#\s*/, '');
+      return (
+        <h1
+          key={index}
+          className="font-bold text-2xl sm:text-3xl mb-4 mt-4 text-blue-200 break-words"
+        >
+          {headerText}
+        </h1>
+      );
     }
 
     // Handle headers with **text**
@@ -40,7 +88,7 @@ const renderFormattedContent = (content, lineColor) => {
                   <h3
                     key={partIndex}
                     className="font-bold text-xl sm:text-2xl mb-1 break-words"
-                    style={{ color: lineColor?.primary || '#333' }}
+                    style={{ color: lineColor?.primary || '#60a5fa' }}
                   >
                     {part}
                   </h3>
@@ -50,7 +98,7 @@ const renderFormattedContent = (content, lineColor) => {
               return (
                 <strong
                   key={partIndex}
-                  className="font-semibold text-base sm:text-lg break-words"
+                  className="font-semibold text-base sm:text-lg text-blue-300 break-words"
                 >
                   {part}
                 </strong>
@@ -62,32 +110,80 @@ const renderFormattedContent = (content, lineColor) => {
       );
     }
 
-    // Handle special formatted fields (like "Platform Name:", "Direction:", etc.)
-    if (line.includes(':')) {
+    // Handle special formatted fields with colons - improved for network status
+    if (line.includes(':') && !line.trim().startsWith('http')) {
       const [label, ...valueParts] = line.split(':');
       const value = valueParts.join(':').trim();
+
+      // Special styling for specific fields
+      const isImportantField = [
+        'ID',
+        'Status Severity Description',
+        'Status Severity',
+        'Reason',
+        'Validity Periods',
+        'Disruption Description',
+        'Travel Advice',
+        'Route',
+        'Operating Hours',
+        'Frequency',
+      ].some((field) => label.trim().includes(field));
 
       return (
         <div
           key={index}
-          className="mb-2 flex flex-col sm:flex-row sm:flex-wrap gap-1"
+          className={`mb-3 flex flex-col gap-1 ${
+            isImportantField ? 'bg-gray-700/30 p-2 rounded' : ''
+          }`}
         >
-          <span className="font-semibold text-gray-300 text-sm">{label}:</span>
-          <span className="text-gray-100 text-sm break-words">{value}</span>
+          <span className="font-semibold text-blue-300 text-sm break-words">
+            {label.trim()}:
+          </span>
+          <span className="text-gray-100 text-sm leading-relaxed pl-2 break-words">
+            {value}
+          </span>
         </div>
       );
     }
 
     // Handle bullet points
     if (line.trim().startsWith('- ')) {
+      const bulletText = line.trim().substring(2);
+
+      // Check if this bullet point contains field information
+      if (bulletText.includes(':')) {
+        const [bulletLabel, ...bulletValueParts] = bulletText.split(':');
+        const bulletValue = bulletValueParts.join(':').trim();
+
+        return (
+          <div
+            key={index}
+            className="flex flex-col gap-1 mb-3 ml-4 sm:ml-6 bg-gray-700/20 p-2 rounded"
+          >
+            <div className="flex items-start gap-2">
+              <span
+                className="w-1.5 h-1.5 sm:w-2 sm:h-2 mt-2 flex-shrink-0 rounded-full"
+                style={{ backgroundColor: lineColor?.primary || '#60a5fa' }}
+              ></span>
+              <span className="font-semibold text-blue-300 text-sm break-words">
+                {bulletLabel.trim()}:
+              </span>
+            </div>
+            <span className="text-gray-100 text-sm leading-relaxed ml-4 break-words">
+              {bulletValue}
+            </span>
+          </div>
+        );
+      }
+
       return (
-        <div key={index} className="flex items-start gap-2 mb-2 ml-2 sm:ml-4">
+        <div key={index} className="flex items-start gap-2 mb-2 ml-4 sm:ml-6">
           <span
-            className="w-1.5 h-1.5 sm:w-2 sm:h-2  mt-2 flex-shrink-0"
-            style={{ backgroundColor: lineColor?.primary || '#6b7280' }}
+            className="w-1.5 h-1.5 sm:w-2 sm:h-2 mt-2 flex-shrink-0 rounded-full"
+            style={{ backgroundColor: lineColor?.primary || '#60a5fa' }}
           ></span>
-          <span className="text-sm leading-relaxed break-words">
-            {line.trim().substring(2)}
+          <span className="text-sm leading-relaxed break-words text-gray-200">
+            {bulletText}
           </span>
         </div>
       );
@@ -95,19 +191,30 @@ const renderFormattedContent = (content, lineColor) => {
 
     // Handle numbered lists
     if (/^\d+\./.test(line.trim())) {
+      const numberMatch = line.trim().match(/^\d+\./)[0];
+      const listText = line.trim().replace(/^\d+\.\s*/, '');
+
       return (
-        <div key={index} className="mb-2 ml-2 sm:ml-4 flex items-start gap-2">
+        <div
+          key={index}
+          className="mb-3 ml-4 sm:ml-6 flex items-start gap-3 bg-gray-700/20 p-2 rounded"
+        >
           <span
-            className="font-semibold text-sm flex-shrink-0"
-            style={{ color: lineColor?.primary || '#374151' }}
+            className="font-bold text-sm flex-shrink-0 min-w-[24px] h-6 flex items-center justify-center rounded-full text-white"
+            style={{ backgroundColor: lineColor?.primary || '#60a5fa' }}
           >
-            {line.trim().match(/^\d+\./)[0]}
+            {numberMatch.replace('.', '')}
           </span>
-          <span className="text-sm leading-relaxed break-words">
-            {line.trim().replace(/^\d+\.\s*/, '')}
+          <span className="text-sm leading-relaxed break-words text-gray-200">
+            {listText}
           </span>
         </div>
       );
+    }
+
+    // Handle lines that are just separators
+    if (line.trim() === '---' || line.trim() === '***') {
+      return <hr key={index} className="my-4 border-gray-600" />;
     }
 
     // Regular paragraphs
@@ -117,6 +224,235 @@ const renderFormattedContent = (content, lineColor) => {
         className="mb-2 text-sm leading-relaxed text-gray-200 break-words"
       >
         {line}
+      </p>
+    );
+  });
+};
+
+// Specialized renderer for Network Status content
+const renderNetworkStatusContent = (content, lineColor) => {
+  const lines = content.split('\n');
+  let currentSection = null;
+
+  return lines.map((line, index) => {
+    const trimmedLine = line.trim();
+
+    // Skip empty lines
+    if (!trimmedLine) {
+      return <div key={index} className="h-2" />;
+    }
+
+    // Handle the main title
+    if (trimmedLine.includes('London Underground Network Status Update')) {
+      return (
+        <div key={index} className="mb-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-blue-200 mb-2">
+            🚇 London Underground Network Status Update
+          </h1>
+        </div>
+      );
+    }
+
+    // Handle Last Updated timestamp
+    if (trimmedLine.startsWith('Last Updated:')) {
+      const timestamp = trimmedLine.replace('Last Updated:', '').trim();
+      return (
+        <div key={index} className="mb-4 p-2 bg-gray-700/30 rounded">
+          <span className="text-xs font-medium text-blue-300">
+            Last Updated:{' '}
+          </span>
+          <span className="text-xs text-gray-300">{timestamp}</span>
+        </div>
+      );
+    }
+
+    // Handle markdown headers
+    if (trimmedLine.startsWith('###')) {
+      currentSection = trimmedLine.replace(/^###\s*/, '');
+      return (
+        <div key={index} className="mt-6 mb-4">
+          <h2 className="text-lg sm:text-xl font-bold text-yellow-400 bg-gray-700/50 p-2 rounded">
+            📋 {currentSection}
+          </h2>
+        </div>
+      );
+    }
+
+    // Handle numbered service entries
+    if (/^\d+\.$/.test(trimmedLine)) {
+      return (
+        <div key={index} className="mt-4 mb-2">
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              {trimmedLine.replace('.', '')}
+            </span>
+            <span className="text-sm font-medium text-blue-300">
+              Service Disruption #{trimmedLine.replace('.', '')}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    // Handle line names (when they appear alone on a line)
+    if (
+      trimmedLine &&
+      !trimmedLine.includes(':') &&
+      !trimmedLine.includes('-') &&
+      trimmedLine.length < 20
+    ) {
+      // Check if it's likely a line name (remove markdown for detection)
+      const cleanLine = trimmedLine.replace(/\*\*/g, '');
+      const possibleLineName = cleanLine.toLowerCase();
+      if (
+        [
+          'central',
+          'circle',
+          'district',
+          'northern',
+          'piccadilly',
+          'bakerloo',
+          'victoria',
+          'jubilee',
+          'metropolitan',
+          'hammersmith',
+          'waterloo',
+          'elizabeth',
+        ].some((line) => possibleLineName.includes(line))
+      ) {
+        return (
+          <div key={index} className="mb-3">
+            <h3 className="text-lg font-bold text-red-400 bg-gray-800/50 p-2 rounded">
+              🚊 {cleanLine}
+            </h3>
+          </div>
+        );
+      }
+    }
+
+    // Handle bullet points with enhanced field styling
+    if (trimmedLine.startsWith('- ')) {
+      let bulletText = trimmedLine.substring(2);
+
+      // Handle markdown in bullet text first
+      if (bulletText.includes('**')) {
+        // Process markdown formatting
+        const processMarkdown = (text) => {
+          const parts = text.split('**');
+          return parts.map((part, partIndex) => {
+            if (partIndex % 2 === 1) {
+              return { type: 'bold', text: part };
+            }
+            return { type: 'normal', text: part };
+          });
+        };
+
+        const processedParts = processMarkdown(bulletText);
+
+        // Check if this contains field information (has colon)
+        if (bulletText.includes(':')) {
+          const colonIndex = bulletText.indexOf(':');
+          const beforeColon = bulletText.substring(0, colonIndex);
+          const afterColon = bulletText.substring(colonIndex + 1).trim();
+
+          // Remove markdown from the label and value for clean display
+          const cleanLabel = beforeColon.replace(/\*\*/g, '');
+          const cleanValue = afterColon.replace(/\*\*/g, '');
+
+          return (
+            <div
+              key={index}
+              className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-2 border-blue-500"
+            >
+              <div className="font-semibold text-blue-300 text-sm mb-1">
+                {cleanLabel.trim()}
+              </div>
+              <div className="text-gray-200 text-sm leading-relaxed">
+                {cleanValue}
+              </div>
+            </div>
+          );
+        } else {
+          // Render markdown in bullet point
+          return (
+            <div key={index} className="flex items-start gap-2 mb-2 ml-4">
+              <span className="w-2 h-2 mt-2 flex-shrink-0 rounded-full bg-blue-400"></span>
+              <span className="text-sm leading-relaxed text-gray-200">
+                {processedParts.map((part, partIndex) => {
+                  if (part.type === 'bold') {
+                    return (
+                      <strong
+                        key={partIndex}
+                        className="font-semibold text-blue-300"
+                      >
+                        {part.text}
+                      </strong>
+                    );
+                  }
+                  return <span key={partIndex}>{part.text}</span>;
+                })}
+              </span>
+            </div>
+          );
+        }
+      }
+
+      // Handle bullet points without markdown
+      if (bulletText.includes(':')) {
+        const [label, ...valueParts] = bulletText.split(':');
+        const value = valueParts.join(':').trim();
+
+        return (
+          <div
+            key={index}
+            className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-2 border-blue-500"
+          >
+            <div className="font-semibold text-blue-300 text-sm mb-1">
+              {label.trim()}
+            </div>
+            <div className="text-gray-200 text-sm leading-relaxed">{value}</div>
+          </div>
+        );
+      }
+
+      return (
+        <div key={index} className="flex items-start gap-2 mb-2 ml-4">
+          <span className="w-2 h-2 mt-2 flex-shrink-0 rounded-full bg-blue-400"></span>
+          <span className="text-sm leading-relaxed text-gray-200">
+            {bulletText}
+          </span>
+        </div>
+      );
+    }
+
+    // Handle separators
+    if (trimmedLine === '---' || trimmedLine === '***') {
+      return <hr key={index} className="my-4 border-gray-500" />;
+    }
+
+    // Handle regular text with markdown processing
+    if (trimmedLine.includes('**')) {
+      const parts = trimmedLine.split('**');
+      return (
+        <p key={index} className="mb-2 text-sm leading-relaxed text-gray-200">
+          {parts.map((part, partIndex) => {
+            if (partIndex % 2 === 1) {
+              return (
+                <strong key={partIndex} className="font-semibold text-blue-300">
+                  {part}
+                </strong>
+              );
+            }
+            return <span key={partIndex}>{part}</span>;
+          })}
+        </p>
+      );
+    }
+
+    // Regular text without markdown
+    return (
+      <p key={index} className="mb-2 text-sm leading-relaxed text-gray-200">
+        {trimmedLine}
       </p>
     );
   });
@@ -204,7 +540,12 @@ export default function ChatMessage({ message }) {
       <div className={getMessageClasses()}>
         {getAgentInfo()}
         <div className="message-content">
-          {renderFormattedContent(message.content, lineColor)}
+          {renderFormattedContent(
+            message.content,
+            lineColor,
+            agent === 'status' ||
+              (message.content && message.content.includes('Network Status')),
+          )}
         </div>
         {/* TFL Data display */}
         {message.tflData && (

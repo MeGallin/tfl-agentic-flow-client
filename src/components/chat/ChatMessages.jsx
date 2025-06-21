@@ -28,7 +28,7 @@ export default function ChatMessages() {
     { id: 'metropolitan', name: 'Metropolitan', backgroundColor: '#9B0056' },
     { id: 'hammersmith-city', name: 'H&C', backgroundColor: '#F3A9BB' },
     { id: 'waterloo-city', name: 'W&C', backgroundColor: '#95CDBA' },
-    { id: 'elizabeth', name: 'Elizabeth', backgroundColor: '#7156A5' }
+    { id: 'elizabeth', name: 'Elizabeth', backgroundColor: '#7156A5' },
   ];
 
   // Auto-scroll to bottom when new messages arrive
@@ -65,9 +65,11 @@ export default function ChatMessages() {
 
   const handleQuestionClick = (question) => {
     // Dispatch a custom event that the ChatInput component will listen for
-    window.dispatchEvent(new CustomEvent('setInputMessage', { 
-      detail: { message: question } 
-    }));
+    window.dispatchEvent(
+      new CustomEvent('setInputMessage', {
+        detail: { message: question },
+      }),
+    );
   };
 
   // Fetch TFL status data
@@ -94,90 +96,167 @@ export default function ChatMessages() {
 
   // Helper function to get status for a specific line
   const getLineStatus = (lineId) => {
-    const status = lineStatuses.find(line => line.id === lineId);
+    const status = lineStatuses.find((line) => line.id === lineId);
     return status?.status || 'Loading...';
   };
 
   // Helper function to get status styling
   const getStatusStyling = (lineId) => {
-    const status = lineStatuses.find(line => line.id === lineId);
+    const status = lineStatuses.find((line) => line.id === lineId);
     const statusText = status?.status?.toLowerCase() || '';
-    
+
     if (statusText.includes('good service')) {
-      return 'text-green-600 font-medium';
-    } else if (statusText.includes('minor delays') || statusText.includes('minor disruption')) {
-      return 'text-yellow-600 font-medium animate-pulse';
-    } else if (statusText.includes('severe delays') || statusText.includes('severe disruption') || statusText.includes('part closure') || statusText.includes('part suspended')) {
-      return 'text-orange-600 font-medium animate-pulse';
-    } else if (statusText.includes('suspended') || statusText.includes('closed')) {
-      return 'text-red-600 font-medium animate-pulse';
+      return 'text-green-600 font-medium bg-gray-100 border border-gray-200';
+    } else if (
+      statusText.includes('minor delays') ||
+      statusText.includes('minor disruption')
+    ) {
+      return 'text-white font-medium bg-red-600 border border-red-500';
+    } else if (
+      statusText.includes('severe delays') ||
+      statusText.includes('severe disruption') ||
+      statusText.includes('part closure') ||
+      statusText.includes('part suspended')
+    ) {
+      return 'text-white font-medium bg-red-600 border border-red-500';
+    } else if (
+      statusText.includes('suspended') ||
+      statusText.includes('closed')
+    ) {
+      return 'text-white font-medium bg-red-600 border border-red-500';
     } else if (statusText.includes('loading')) {
-      return 'text-gray-400 animate-pulse';
+      return 'text-gray-400 bg-gray-100 border border-gray-200';
     }
-    
-    return 'text-gray-600';
+
+    return 'text-gray-600 bg-gray-100 border border-gray-200';
+  };
+
+  // Helper function to determine if card should be pulsating
+  const getIsPulsating = (lineId) => {
+    const status = lineStatuses.find((line) => line.id === lineId);
+    const statusText = status?.status?.toLowerCase() || '';
+
+    // Return true for any status that is NOT "good service"
+    return (
+      !statusText.includes('good service') && !statusText.includes('loading')
+    );
   };
 
   // Show welcome message if no messages
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex-1 overflow-y-auto overflow-x-hidden" style={{background: 'rgba(51,51,51,1)'}}>
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden"
+        style={{ background: 'rgba(51,51,51,1)' }}
+      >
         <div className="min-h-full p-3 sm:p-4 lg:p-6 pb-6 sm:pb-8">
           <div className="max-w-6xl mx-auto">
             {/* Quick Help Section */}
             <div className="mb-6">
-              <div className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl" style={{background: 'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))'}}>
+              <div
+                className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl"
+                style={{
+                  background:
+                    'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))',
+                }}
+              >
                 <div className="text-center mb-4 sm:mb-6">
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">Quick Start</h3>
-                  <p className="text-gray-300 text-xs mt-2">Try these examples:</p>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white">
+                    Quick Start
+                  </h3>
+                  <p className="text-gray-300 text-xs mt-2">
+                    Try these examples:
+                  </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <button 
-                    onClick={() => handleQuestionClick("What's the status of all lines?")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick("What's the status of all lines?")
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">📊</span>
-                      <span className="text-sm sm:text-base">"What's the status of all lines?"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        📊
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "What's the status of all lines?"
+                      </span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleQuestionClick("Next train at Oxford Circus")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick('Next train at Oxford Circus')
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">🚇</span>
-                      <span className="text-sm sm:text-base">"Next train at Oxford Circus"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        🚇
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "Next train at Oxford Circus"
+                      </span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleQuestionClick("Plan route to Heathrow")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick('Plan route to Heathrow')
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">✈️</span>
-                      <span className="text-sm sm:text-base">"Plan route to Heathrow"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        ✈️
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "Plan route to Heathrow"
+                      </span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleQuestionClick("Circle line disruptions")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick('Circle line disruptions')
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">⚠️</span>
-                      <span className="text-sm sm:text-base">"Circle line disruptions"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        ⚠️
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "Circle line disruptions"
+                      </span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleQuestionClick("Station accessibility info")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick('Station accessibility info')
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">♿</span>
-                      <span className="text-sm sm:text-base">"Station accessibility info"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        ♿
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "Station accessibility info"
+                      </span>
                     </div>
                   </button>
-                  <button 
-                    onClick={() => handleQuestionClick("Weekend service updates")}
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600">
+                  <button
+                    onClick={() =>
+                      handleQuestionClick('Weekend service updates')
+                    }
+                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">📅</span>
-                      <span className="text-sm sm:text-base">"Weekend service updates"</span>
+                      <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
+                        📅
+                      </span>
+                      <span className="text-sm sm:text-base">
+                        "Weekend service updates"
+                      </span>
                     </div>
                   </button>
                 </div>
@@ -186,7 +265,13 @@ export default function ChatMessages() {
 
             {/* Live Network Status */}
             <div className="mb-6">
-              <div className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 shadow-xl" style={{background: 'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))'}}>
+              <div
+                className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 shadow-xl"
+                style={{
+                  background:
+                    'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))',
+                }}
+              >
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
                   <div className="text-center flex-1">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-100">
@@ -204,7 +289,11 @@ export default function ChatMessages() {
                     className="ml-4 p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
                     title="Refresh status data"
                   >
-                    <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`w-5 h-5 ${
+                        isRefreshing ? 'animate-spin' : ''
+                      }`}
+                    />
                   </button>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
@@ -216,6 +305,7 @@ export default function ChatMessages() {
                       backgroundColor={line.backgroundColor}
                       getLineStatus={getLineStatus}
                       getStatusStyling={getStatusStyling}
+                      isPulsating={getIsPulsating(line.id)}
                     />
                   ))}
                 </div>
