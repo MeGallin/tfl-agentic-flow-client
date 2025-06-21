@@ -5,24 +5,30 @@ const useSpeechRecognition = () => {
   const [listening, setListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [browserSupportsRecognition, setBrowserSupportsRecognition] = useState(false);
+  const [browserSupportsRecognition, setBrowserSupportsRecognition] =
+    useState(false);
   const [isMicrophoneAvailable, setIsMicrophoneAvailable] = useState(false);
-  
+
   const recognitionRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioStreamRef = useRef(null);
 
   const checkBrowserSupport = useCallback(async () => {
     // Check for Web Speech API support
-    const hasWebSpeechAPI = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-    const hasMediaDevices = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    
+    const hasWebSpeechAPI =
+      'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+    const hasMediaDevices = !!(
+      navigator.mediaDevices && navigator.mediaDevices.getUserMedia
+    );
+
     setBrowserSupportsRecognition(hasWebSpeechAPI && hasMediaDevices);
-    
+
     if (hasMediaDevices) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // Immediately stop
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        stream.getTracks().forEach((track) => track.stop()); // Immediately stop
         setIsMicrophoneAvailable(true);
       } catch {
         setIsMicrophoneAvailable(false);
@@ -41,9 +47,10 @@ const useSpeechRecognition = () => {
     if (recognitionRef.current) return recognitionRef.current;
 
     try {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      
+
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
@@ -57,16 +64,18 @@ const useSpeechRecognition = () => {
 
       recognition.onresult = (event) => {
         let finalTranscript = '';
-        
+
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
           if (result.isFinal) {
             finalTranscript += result[0].transcript;
           }
         }
-        
+
         if (finalTranscript) {
-          setTranscript(prev => prev + (prev ? ' ' : '') + finalTranscript.trim());
+          setTranscript(
+            (prev) => prev + (prev ? ' ' : '') + finalTranscript.trim(),
+          );
         }
       };
 
@@ -90,30 +99,33 @@ const useSpeechRecognition = () => {
     }
   }, []);
 
-  const startListening = useCallback(async ({ continuous = true } = {}) => {
-    if (!browserSupportsRecognition) {
-      setError('Speech recognition not supported in this browser');
-      return;
-    }
-
-    if (!isMicrophoneAvailable) {
-      setError('Microphone access not available');
-      return;
-    }
-
-    try {
-      const recognition = recognitionRef.current || initializeRecognition();
-      if (!recognition) {
-        setError('Failed to initialize speech recognition');
+  const startListening = useCallback(
+    async ({ continuous = true } = {}) => {
+      if (!browserSupportsRecognition) {
+        setError('Speech recognition not supported in this browser');
         return;
       }
 
-      recognition.start();
-    } catch (err) {
-      console.error('Failed to start speech recognition:', err);
-      setError('Failed to start speech recognition: ' + err.message);
-    }
-  }, [browserSupportsRecognition, isMicrophoneAvailable, initializeRecognition]);
+      if (!isMicrophoneAvailable) {
+        setError('Microphone access not available');
+        return;
+      }
+
+      try {
+        const recognition = recognitionRef.current || initializeRecognition();
+        if (!recognition) {
+          setError('Failed to initialize speech recognition');
+          return;
+        }
+
+        recognition.start();
+      } catch (err) {
+        console.error('Failed to start speech recognition:', err);
+        setError('Failed to start speech recognition: ' + err.message);
+      }
+    },
+    [browserSupportsRecognition, isMicrophoneAvailable, initializeRecognition],
+  );
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {

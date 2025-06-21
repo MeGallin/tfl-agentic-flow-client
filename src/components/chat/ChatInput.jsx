@@ -29,7 +29,7 @@ export default function ChatInput() {
     isMicrophoneAvailable,
     startListening: speechStart,
     stopListening: speechStop,
-    resetTranscript
+    resetTranscript,
   } = useSpeechRecognition();
 
   // Handle speech recognition errors - only log, don't set error to prevent loops
@@ -52,7 +52,8 @@ export default function ChatInput() {
     };
 
     window.addEventListener('setInputMessage', handleSetInputMessage);
-    return () => window.removeEventListener('setInputMessage', handleSetInputMessage);
+    return () =>
+      window.removeEventListener('setInputMessage', handleSetInputMessage);
   }, []);
 
   // Update message when transcript changes
@@ -105,7 +106,9 @@ export default function ChatInput() {
     }
     if (!isMicrophoneAvailable) {
       // Show a temporary notification instead of setting global error
-      console.warn('Microphone access is not available. Please check your permissions.');
+      console.warn(
+        'Microphone access is not available. Please check your permissions.',
+      );
       return;
     }
     resetTranscript();
@@ -272,7 +275,6 @@ export default function ChatInput() {
             >
               <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            
             {/* Speech Recognition Button */}
             {browserSupportsSpeechRecognition && (
               <button
@@ -287,10 +289,10 @@ export default function ChatInput() {
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
                 }`}
                 title={
-                  speechLoading 
-                    ? 'Loading speech recognition...' 
-                    : listening 
-                    ? 'Stop listening' 
+                  speechLoading
+                    ? 'Loading speech recognition...'
+                    : listening
+                    ? 'Stop listening'
                     : 'Start voice input'
                 }
               >
