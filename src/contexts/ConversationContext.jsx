@@ -35,15 +35,18 @@ function conversationReducer(state, action) {
       };
 
     case CONVERSATION_ACTIONS.ADD_MESSAGE:
+      const newMessage = {
+        ...action.payload,
+        id: action.payload.id || uuidv4(),
+        timestamp: action.payload.timestamp || new Date().toISOString(),
+      };
+      console.log('ConversationContext: Reducer adding message:', newMessage);
+      console.log('ConversationContext: Current messages count:', state.messages.length);
       return {
         ...state,
         messages: [
           ...state.messages,
-          {
-            ...action.payload,
-            id: action.payload.id || uuidv4(),
-            timestamp: action.payload.timestamp || new Date().toISOString(),
-          },
+          newMessage,
         ],
         error: null,
       };
@@ -115,6 +118,7 @@ export function ConversationProvider({ children }) {
     },
 
     addMessage: (message) => {
+      console.log('ConversationContext: Adding message:', message);
       dispatch({ type: CONVERSATION_ACTIONS.ADD_MESSAGE, payload: message });
     },
 
@@ -144,7 +148,7 @@ export function ConversationProvider({ children }) {
       dispatch({ type: CONVERSATION_ACTIONS.CLEAR_CONVERSATION });
     }, // Clear all saved conversations from localStorage
     clearAllConversations: () => {
-      console.log('Clearing all conversations from localStorage');
+      console.log('clearAllConversations called');
       const keys = Object.keys(localStorage).filter((key) =>
         key.startsWith('conversation_'),
       );
@@ -180,15 +184,6 @@ export function ConversationProvider({ children }) {
     }
   }, [state.messages, state.threadId, state.activeAgent]); // Load conversation from localStorage on mount (only if no messages exist)
   useEffect(() => {
-    // TEMPORARY: Clear localStorage for debugging
-    console.log('DEBUGGING: Clearing all localStorage conversations');
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith('conversation_'))
-      .forEach((key) => {
-        console.log('Removing localStorage key:', key);
-        localStorage.removeItem(key);
-      });
-
     // Only load saved conversation if we don't already have messages
     if (state.messages.length === 0) {
       console.log('ConversationContext: Loading saved conversations...');

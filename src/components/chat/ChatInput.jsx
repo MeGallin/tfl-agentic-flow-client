@@ -1,13 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Lightbulb, X, Mic, MicOff } from 'lucide-react';
+import { Send, Loader2, Lightbulb, X, Mic, MicOff, Zap } from 'lucide-react';
 import useSpeechRecognition from '../../hooks/useSpeechRecognition';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
+import ConfirmationDialog from './ConfirmationDialog';
+import StreamingIndicator from './StreamingIndicator';
 
 export default function ChatInput() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [pendingConfirmation, setPendingConfirmation] = useState(null);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingData, setStreamingData] = useState(null);
+  const [useStreamingMode, setUseStreamingMode] = useState(false);
   const inputRef = useRef(null);
   const {
     addMessage,
@@ -119,72 +125,160 @@ export default function ChatInput() {
     speechStop();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Helper to determine if query should use streaming
+  const shouldUseStreamingForQuery = (query) => {
+    const streamingKeywords = [
+      'journey from',
+      'travel from',
+      'route from',
+      'plan journey',
+      'multiple lines',
+      'network status',
+      'compare',
+      'alternative'
+    ];
+    
+    const queryLower = query.toLowerCase();
+    return streamingKeywords.some(keyword => queryLower.includes(keyword));
+  };
 
-    if (!message.trim() || isSending || isLoading) {
-      return;
-    }
-
-    const userMessage = message.trim();
-    setMessage('');
-    setIsSending(true);
-    setError(null);
-
+  // Handle streaming submission
+  const handleStreamingSubmit = async (userMessage) => {
     try {
-      // Add user message to conversation
-      addMessage({
-        role: 'user',
-        content: userMessage,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Show typing indicator
+      // User message already added in handleSubmit
+      setIsStreaming(true);
+      setStreamingData({ currentStep: 'input_validation', agent: null });
       setTypingIndicator(true);
-      setLoading(true); // Send message to API
+      setLoading(true);
+
+      // Create streaming connection
+      const eventSource = await apiService.streamMessage(userMessage, threadId);
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.done) {
+            // Streaming complete
+            setIsStreaming(false);
+            setStreamingData(null);
+            eventSource.close();
+            return;
+          }
+
+          if (data.error) {
+            throw new Error(data.message);
+          }
+
+          // Update streaming indicator
+          setStreamingData({
+            currentStep: data.step,
+            agent: data.agent,
+            partialResponse: data.partialResponse
+          });
+
+          // If we have a partial response, show it
+          if (data.partialResponse && data.step === 'finalize_response') {
+            addMessage({
+              role: 'assistant',
+              content: data.partialResponse,
+              agent: data.agent,
+              streaming: true,
+              timestamp: data.metadata?.timestamp || new Date().toISOString(),
+            });
+          }
+        } catch (parseError) {
+          console.error('Error parsing streaming data:', parseError);
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error('Streaming error:', error);
+        setError('Streaming connection failed. Falling back to standard mode...');
+        
+        // Fallback to regular request
+        handleRegularSubmit(userMessage);
+        
+        setIsStreaming(false);
+        setStreamingData(null);
+        eventSource.close();
+      };
+
+    } catch (error) {
+      console.error('Failed to start streaming:', error);
+      setError('Failed to start streaming. Using standard mode...');
+      
+      // Fallback to regular request
+      handleRegularSubmit(userMessage);
+    } finally {
+      setIsSending(false);
+      setLoading(false);
+      setTypingIndicator(false);
+    }
+  };
+
+  // Handle regular (non-streaming) submission
+  const handleRegularSubmit = async (userMessage) => {
+    try {
+      // Set loading and typing indicators
+      setLoading(true);
+      setTypingIndicator(true);
+      
+      // Send message to API
       const response = await apiService.sendMessage(userMessage, threadId);
 
       // Debug: Log the full response to see what we're getting
       console.log('=== API RESPONSE DEBUG ===');
       console.log('Full response object:', response);
-      console.log('response.response (the content):', response.response);
-      console.log('response.response type:', typeof response.response);
-      console.log(
-        'response.response length:',
-        response.response ? response.response.length : 'undefined',
-      );
-      console.log('response.success:', response.success);
-      console.log('response.agent:', response.agent);
+      console.log('requiresConfirmation:', response.requiresConfirmation);
+      console.log('awaitingConfirmation:', response.awaitingConfirmation);
 
       // Update active agent if specified in response
       if (response.agent) {
         setActiveAgent(response.agent);
       }
 
-      // Prepare message object - being very explicit
-      const assistantContent = response.response; // Extract this explicitly
-      console.log('Extracted assistantContent:', assistantContent);
-      console.log('assistantContent type:', typeof assistantContent);
+      // Check if response requires confirmation
+      if (response.requiresConfirmation || response.awaitingConfirmation) {
+        // Store the pending confirmation data
+        setPendingConfirmation({
+          originalMessage: userMessage,
+          response: response.response,
+          threadId: response.threadId,
+          metadata: {
+            agent: response.agent,
+            confidence: response.confidence,
+            timestamp: response.timestamp
+          }
+        });
 
-      const messageToAdd = {
-        role: 'assistant',
-        content: assistantContent, // Use the explicitly extracted content
-        agent: response.agent,
-        metadata: response.metadata,
-        tflData: response.tflData,
-        lineColor: response.lineColor,
-        timestamp: response.timestamp || new Date().toISOString(),
-      };
+        // Add the confirmation message to conversation
+        addMessage({
+          role: 'assistant',
+          content: response.response,
+          agent: response.agent,
+          metadata: response.metadata,
+          tflData: response.tflData,
+          lineColor: response.lineColor,
+          requiresConfirmation: true,
+          timestamp: response.timestamp || new Date().toISOString(),
+        });
+      } else {
+        // Normal response - add directly to conversation
+        const messageToAdd = {
+          role: 'assistant',
+          content: response.response,
+          agent: response.agent,
+          metadata: response.metadata,
+          tflData: response.tflData,
+          lineColor: response.lineColor,
+          collaborative: response.collaborative,
+          agentsUsed: response.agentsUsed,
+          timestamp: response.timestamp || new Date().toISOString(),
+        };
 
-      // Debug: Log the message object being added
-      console.log('=== MESSAGE OBJECT DEBUG ===');
-      console.log('Message object being added:', messageToAdd);
-      console.log('messageToAdd.content:', messageToAdd.content);
-      console.log('messageToAdd.content type:', typeof messageToAdd.content);
-
-      // Add assistant response to conversation
-      console.log('Adding message to conversation...');
-      addMessage(messageToAdd);
+        addMessage(messageToAdd);
+      }
     } catch (error) {
       console.error('Failed to send message:', error);
       setError(error.message || 'Failed to send message. Please try again.');
@@ -204,6 +298,94 @@ export default function ChatInput() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!message.trim() || isSending || isLoading) {
+      return;
+    }
+
+    const userMessage = message.trim();
+    setMessage('');
+    setIsSending(true);
+    setError(null);
+
+    // Add user message to conversation first
+    addMessage({
+      role: 'user',
+      content: userMessage,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Check if we should use streaming mode for this query
+    const shouldStream = useStreamingMode || shouldUseStreamingForQuery(userMessage);
+
+    if (shouldStream) {
+      return handleStreamingSubmit(userMessage);
+    } else {
+      return handleRegularSubmit(userMessage);
+    }
+  };
+
+  // Handle confirmation response
+  const handleConfirmation = async (confirmed) => {
+    if (!pendingConfirmation) return;
+
+    setIsSending(true);
+    setError(null);
+
+    try {
+      setTypingIndicator(true);
+      setLoading(true);
+
+      // Send confirmation to API
+      const response = await apiService.sendMessageWithConfirmation(
+        pendingConfirmation.originalMessage,
+        pendingConfirmation.threadId,
+        confirmed,
+        {}
+      );
+
+      // Update active agent
+      if (response.agent) {
+        setActiveAgent(response.agent);
+      }
+
+      // Add the final response to conversation
+      addMessage({
+        role: 'assistant',
+        content: response.response,
+        agent: response.agent,
+        metadata: {
+          ...response.metadata,
+          confirmedBy: 'user',
+          userConfirmation: confirmed
+        },
+        tflData: response.tflData,
+        lineColor: response.lineColor,
+        timestamp: response.timestamp || new Date().toISOString(),
+      });
+
+      // Clear pending confirmation
+      setPendingConfirmation(null);
+
+    } catch (error) {
+      console.error('Failed to send confirmation:', error);
+      setError(error.message || 'Failed to process confirmation. Please try again.');
+
+      addMessage({
+        role: 'assistant',
+        content: 'I apologize, but I encountered an error processing your confirmation. Please try again.',
+        isError: true,
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      setIsSending(false);
+      setLoading(false);
+      setTypingIndicator(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -213,7 +395,25 @@ export default function ChatInput() {
   const isDisabled = isSending || isLoading;
   return (
     <>
-      {' '}
+      {/* Streaming Indicator */}
+      {isStreaming && (
+        <StreamingIndicator
+          isStreaming={isStreaming}
+          currentStep={streamingData?.currentStep}
+          agentName={streamingData?.agent}
+          onComplete={() => setIsStreaming(false)}
+        />
+      )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        message={pendingConfirmation?.response || ''}
+        onConfirm={() => handleConfirmation(true)}
+        onReject={() => handleConfirmation(false)}
+        isVisible={!!pendingConfirmation}
+        metadata={pendingConfirmation?.metadata || {}}
+      />
+
       {/* Examples Modal */}
       {showExamples && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-3 pt-12 sm:p-6">
@@ -305,6 +505,21 @@ export default function ChatInput() {
                 )}
               </button>
             )}
+
+            {/* Streaming Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setUseStreamingMode(!useStreamingMode)}
+              disabled={isDisabled}
+              className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
+                useStreamingMode
+                  ? 'text-blue-400 bg-blue-900 border-blue-600 hover:bg-blue-800'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+              }`}
+              title={useStreamingMode ? 'Disable streaming mode' : 'Enable streaming mode'}
+            >
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
             {/* Input Field */}
             <div className="flex-1">
               <textarea

@@ -88,6 +88,38 @@ export const apiService = {
     }
   },
 
+  // Send chat message with confirmation
+  async sendMessageWithConfirmation(message, threadId, userConfirmation, userContext = {}) {
+    try {
+      const response = await api.post('/api/chat/confirm', {
+        query: message,
+        threadId,
+        userConfirmation,
+        userContext,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to send message with confirmation:', error);
+      throw error;
+    }
+  },
+
+  // Stream chat messages (Server-Sent Events)
+  async streamMessage(message, threadId = null, userContext = {}) {
+    try {
+      const params = new URLSearchParams({
+        query: message,
+        userContext: JSON.stringify(userContext)
+      });
+      
+      const url = `/api/chat/stream/${threadId || 'new'}?${params}`;
+      return new EventSource(`${API_BASE_URL}${url}`);
+    } catch (error) {
+      console.error('Failed to create stream connection:', error);
+      throw error;
+    }
+  },
+
   // Get conversation history
   async getConversation(threadId) {
     try {

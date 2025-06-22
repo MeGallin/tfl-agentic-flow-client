@@ -8,6 +8,11 @@ import './ChatMessages.css';
 
 export default function ChatMessages() {
   const { messages, isLoading, isTyping, error } = useConversation();
+  
+  // Debug logging
+  console.log('ChatMessages: Current messages:', messages);
+  console.log('ChatMessages: isLoading:', isLoading);
+  console.log('ChatMessages: isTyping:', isTyping);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);

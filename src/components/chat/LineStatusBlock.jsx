@@ -1,4 +1,4 @@
-import TypewriterText from '../ui/TypewriterText';
+import TypewriterText from '../UI/TypewriterText';
 
 export default function LineStatusBlock({
   lineId,
