@@ -64,10 +64,10 @@ export default function ChatInput() {
 
   // Update message when transcript changes
   useEffect(() => {
-    if (transcript) {
+    if (transcript && listening) {
       setMessage(transcript);
     }
-  }, [transcript]);
+  }, [transcript, listening]);
 
   // Example suggestions organized by category
   const exampleSuggestions = {
@@ -214,6 +214,8 @@ export default function ChatInput() {
       setIsSending(false);
       setLoading(false);
       setTypingIndicator(false);
+      // Ensure transcript is fully cleared after response
+      resetTranscript();
     }
   };
 
@@ -295,6 +297,8 @@ export default function ChatInput() {
       setIsSending(false);
       setLoading(false);
       setTypingIndicator(false);
+      // Ensure transcript is fully cleared after response
+      resetTranscript();
     }
   };
 
@@ -309,6 +313,12 @@ export default function ChatInput() {
     setMessage('');
     setIsSending(true);
     setError(null);
+    
+    // Clear transcript and stop listening if voice recognition was used
+    if (listening) {
+      stopListening();
+    }
+    resetTranscript();
 
     // Add user message to conversation first
     addMessage({
@@ -383,6 +393,8 @@ export default function ChatInput() {
       setIsSending(false);
       setLoading(false);
       setTypingIndicator(false);
+      // Ensure transcript is fully cleared after response
+      resetTranscript();
     }
   };
 

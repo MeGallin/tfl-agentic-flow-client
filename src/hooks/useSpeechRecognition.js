@@ -73,9 +73,11 @@ const useSpeechRecognition = () => {
         }
 
         if (finalTranscript) {
-          setTranscript(
-            (prev) => prev + (prev ? ' ' : '') + finalTranscript.trim(),
-          );
+          setTranscript(finalTranscript.trim());
+          // Auto-stop listening after receiving final result
+          if (recognitionRef.current) {
+            recognitionRef.current.stop();
+          }
         }
       };
 
