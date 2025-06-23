@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Lightbulb, X, Mic, MicOff, Zap } from 'lucide-react';
+import {
+  Send,
+  Loader2,
+  Lightbulb,
+  X,
+  Mic,
+  MicOff,
+  Zap,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import useSpeechRecognition from '../../hooks/useSpeechRecognition';
 import { useConversation } from '../../contexts/ConversationContext';
 import { apiService } from '../../services/api';
@@ -10,6 +20,7 @@ export default function ChatInput() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showExamples, setShowExamples] = useState(false);
+  const [showMobileActions, setShowMobileActions] = useState(false);
   const [pendingConfirmation, setPendingConfirmation] = useState(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingData, setStreamingData] = useState(null);
@@ -38,7 +49,7 @@ export default function ChatInput() {
     resetTranscript,
   } = useSpeechRecognition({
     pauseDelay: 2500, // 2.5 seconds - gives users time to continue speaking
-    enablePauseDetection: true // Enable the improved pause detection
+    enablePauseDetection: true, // Enable the improved pause detection
   });
 
   // Handle speech recognition errors - only log, don't set error to prevent loops
@@ -71,6 +82,14 @@ export default function ChatInput() {
       setMessage(transcript);
     }
   }, [transcript, listening]);
+
+  // Responsive placeholder text
+  const getPlaceholderText = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      return 'Ask about TFL services...';
+    }
+    return 'Ask about any TFL line, station, journey planning, or service updates...';
+  };
 
   // Example suggestions organized by category
   const exampleSuggestions = {
@@ -138,11 +157,11 @@ export default function ChatInput() {
       'multiple lines',
       'network status',
       'compare',
-      'alternative'
+      'alternative',
     ];
-    
+
     const queryLower = query.toLowerCase();
-    return streamingKeywords.some(keyword => queryLower.includes(keyword));
+    return streamingKeywords.some((keyword) => queryLower.includes(keyword));
   };
 
   // Handle streaming submission
@@ -156,11 +175,11 @@ export default function ChatInput() {
 
       // Create streaming connection
       const eventSource = await apiService.streamMessage(userMessage, threadId);
-      
+
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          
+
           if (data.done) {
             // Streaming complete
             setIsStreaming(false);
@@ -177,7 +196,7 @@ export default function ChatInput() {
           setStreamingData({
             currentStep: data.step,
             agent: data.agent,
-            partialResponse: data.partialResponse
+            partialResponse: data.partialResponse,
           });
 
           // If we have a partial response, show it
@@ -197,20 +216,21 @@ export default function ChatInput() {
 
       eventSource.onerror = (error) => {
         console.error('Streaming error:', error);
-        setError('Streaming connection failed. Falling back to standard mode...');
-        
+        setError(
+          'Streaming connection failed. Falling back to standard mode...',
+        );
+
         // Fallback to regular request
         handleRegularSubmit(userMessage);
-        
+
         setIsStreaming(false);
         setStreamingData(null);
         eventSource.close();
       };
-
     } catch (error) {
       console.error('Failed to start streaming:', error);
       setError('Failed to start streaming. Using standard mode...');
-      
+
       // Fallback to regular request
       handleRegularSubmit(userMessage);
     } finally {
@@ -228,7 +248,7 @@ export default function ChatInput() {
       // Set loading and typing indicators
       setLoading(true);
       setTypingIndicator(true);
-      
+
       // Send message to API
       const response = await apiService.sendMessage(userMessage, threadId);
 
@@ -253,8 +273,8 @@ export default function ChatInput() {
           metadata: {
             agent: response.agent,
             confidence: response.confidence,
-            timestamp: response.timestamp
-          }
+            timestamp: response.timestamp,
+          },
         });
 
         // Add the confirmation message to conversation
@@ -316,7 +336,7 @@ export default function ChatInput() {
     setMessage('');
     setIsSending(true);
     setError(null);
-    
+
     // Clear transcript and stop listening if voice recognition was used
     if (listening) {
       stopListening();
@@ -331,7 +351,8 @@ export default function ChatInput() {
     });
 
     // Check if we should use streaming mode for this query
-    const shouldStream = useStreamingMode || shouldUseStreamingForQuery(userMessage);
+    const shouldStream =
+      useStreamingMode || shouldUseStreamingForQuery(userMessage);
 
     if (shouldStream) {
       return handleStreamingSubmit(userMessage);
@@ -356,7 +377,7 @@ export default function ChatInput() {
         pendingConfirmation.originalMessage,
         pendingConfirmation.threadId,
         confirmed,
-        {}
+        {},
       );
 
       // Update active agent
@@ -372,7 +393,7 @@ export default function ChatInput() {
         metadata: {
           ...response.metadata,
           confirmedBy: 'user',
-          userConfirmation: confirmed
+          userConfirmation: confirmed,
         },
         tflData: response.tflData,
         lineColor: response.lineColor,
@@ -381,14 +402,16 @@ export default function ChatInput() {
 
       // Clear pending confirmation
       setPendingConfirmation(null);
-
     } catch (error) {
       console.error('Failed to send confirmation:', error);
-      setError(error.message || 'Failed to process confirmation. Please try again.');
+      setError(
+        error.message || 'Failed to process confirmation. Please try again.',
+      );
 
       addMessage({
         role: 'assistant',
-        content: 'I apologize, but I encountered an error processing your confirmation. Please try again.',
+        content:
+          'I apologize, but I encountered an error processing your confirmation. Please try again.',
         isError: true,
         timestamp: new Date().toISOString(),
       });
@@ -478,63 +501,153 @@ export default function ChatInput() {
       {/* Compact Input Area */}
       <div className="bg-gray-800 border-t border-gray-700 p-3 sm:p-4 flex-shrink-0">
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-          <div className="flex gap-2 sm:gap-3">
-            {' '}
-            {/* Examples Button */}
-            <button
-              type="button"
-              onClick={() => setShowExamples(true)}
-              disabled={isDisabled}
-              className="flex-shrink-0 p-2 sm:p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 border border-gray-600 hover:border-gray-500"
-              title="Show example questions"
-            >
-              <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
-            {/* Speech Recognition Button */}
-            {browserSupportsSpeechRecognition && (
+          {/* Mobile: Collapsible Actions Row - Above input */}
+          <div
+            className={`sm:hidden mb-3 transition-all duration-300 overflow-hidden ${
+              showMobileActions
+                ? 'max-h-[60px] opacity-100'
+                : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="flex gap-4 justify-center px-4">
               <button
                 type="button"
-                onClick={listening ? stopListening : startListening}
-                disabled={isDisabled || speechLoading}
-                className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
-                  listening
-                    ? 'text-red-400 bg-red-900 border-red-600 hover:bg-red-800 animate-pulse'
-                    : speechLoading
-                    ? 'text-blue-400 bg-blue-900 border-blue-600'
+                onClick={() => setShowExamples(true)}
+                disabled={isDisabled}
+                className="flex-shrink-0 p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 border border-gray-600 hover:border-gray-500"
+                title="Show example questions"
+              >
+                <Lightbulb className="w-5 h-5" />
+              </button>
+
+              {browserSupportsSpeechRecognition && (
+                <button
+                  type="button"
+                  onClick={listening ? stopListening : startListening}
+                  disabled={isDisabled || speechLoading}
+                  className={`flex-shrink-0 p-3 rounded-lg transition-colors disabled:opacity-50 border ${
+                    listening
+                      ? 'text-red-400 bg-red-900 border-red-600 hover:bg-red-800 animate-pulse'
+                      : speechLoading
+                      ? 'text-blue-400 bg-blue-900 border-blue-600'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+                  }`}
+                  title={
+                    speechLoading
+                      ? 'Loading speech recognition...'
+                      : listening
+                      ? 'Stop listening'
+                      : 'Start voice input'
+                  }
+                >
+                  {speechLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : listening ? (
+                    <MicOff className="w-5 h-5" />
+                  ) : (
+                    <Mic className="w-5 h-5" />
+                  )}
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setUseStreamingMode(!useStreamingMode)}
+                disabled={isDisabled}
+                className={`flex-shrink-0 p-3 rounded-lg transition-colors disabled:opacity-50 border ${
+                  useStreamingMode
+                    ? 'text-blue-400 bg-blue-900 border-blue-600 hover:bg-blue-800'
                     : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
                 }`}
                 title={
-                  speechLoading
-                    ? 'Loading speech recognition...'
-                    : listening
-                    ? 'Stop listening'
-                    : 'Start voice input'
+                  useStreamingMode
+                    ? 'Disable streaming mode'
+                    : 'Enable streaming mode'
                 }
               >
-                {speechLoading ? (
-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                ) : listening ? (
-                  <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Zap className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-2 sm:gap-3">
+            {/* Mobile: Toggle Button */}
+            <div className="sm:hidden">
+              <button
+                type="button"
+                onClick={() => setShowMobileActions(!showMobileActions)}
+                disabled={isDisabled}
+                className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 border border-gray-600 hover:border-gray-500"
+                title="Toggle quick actions"
+              >
+                {showMobileActions ? (
+                  <ChevronUp className="w-4 h-4" />
                 ) : (
-                  <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <ChevronDown className="w-4 h-4" />
                 )}
               </button>
-            )}
+            </div>
 
-            {/* Streaming Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setUseStreamingMode(!useStreamingMode)}
-              disabled={isDisabled}
-              className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
-                useStreamingMode
-                  ? 'text-blue-400 bg-blue-900 border-blue-600 hover:bg-blue-800'
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
-              }`}
-              title={useStreamingMode ? 'Disable streaming mode' : 'Enable streaming mode'}
-            >
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+            {/* Desktop: All buttons visible */}
+            <div className="hidden sm:flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowExamples(true)}
+                disabled={isDisabled}
+                className="flex-shrink-0 p-2 sm:p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 border border-gray-600 hover:border-gray-500"
+                title="Show example questions"
+              >
+                <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
+              {browserSupportsSpeechRecognition && (
+                <button
+                  type="button"
+                  onClick={listening ? stopListening : startListening}
+                  disabled={isDisabled || speechLoading}
+                  className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
+                    listening
+                      ? 'text-red-400 bg-red-900 border-red-600 hover:bg-red-800 animate-pulse'
+                      : speechLoading
+                      ? 'text-blue-400 bg-blue-900 border-blue-600'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+                  }`}
+                  title={
+                    speechLoading
+                      ? 'Loading speech recognition...'
+                      : listening
+                      ? 'Stop listening'
+                      : 'Start voice input'
+                  }
+                >
+                  {speechLoading ? (
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                  ) : listening ? (
+                    <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                  ) : (
+                    <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setUseStreamingMode(!useStreamingMode)}
+                disabled={isDisabled}
+                className={`flex-shrink-0 p-2 sm:p-3 rounded-md transition-colors disabled:opacity-50 border ${
+                  useStreamingMode
+                    ? 'text-blue-400 bg-blue-900 border-blue-600 hover:bg-blue-800'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+                }`}
+                title={
+                  useStreamingMode
+                    ? 'Disable streaming mode'
+                    : 'Enable streaming mode'
+                }
+              >
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            </div>
             {/* Input Field */}
             <div className="flex-1">
               <textarea
@@ -542,7 +655,7 @@ export default function ChatInput() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about any TFL line, station, journey planning, or service updates..."
+                placeholder={getPlaceholderText()}
                 className="textarea-field min-h-[64px] sm:min-h-[72px] max-h-[120px] resize-none text-sm sm:text-base bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400 flex items-center justify-center text-center"
                 disabled={isDisabled}
                 rows={2}
