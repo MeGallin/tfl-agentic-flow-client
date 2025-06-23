@@ -8,7 +8,7 @@ import './ChatMessages.css';
 
 export default function ChatMessages() {
   const { messages, isLoading, isTyping, error } = useConversation();
-  
+
   // Debug logging
   console.log('ChatMessages: Current messages:', messages);
   console.log('ChatMessages: isLoading:', isLoading);
@@ -152,17 +152,17 @@ export default function ChatMessages() {
     return (
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden"
-        style={{ background: 'rgba(51,51,51,1)' }}
+        style={{ background: 'black' }}
       >
         <div className="min-h-full p-3 sm:p-4 lg:p-6 pb-6 sm:pb-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="w-full">
+            {/* Full width instead of max-w-6xl mx-auto */}
             {/* Quick Help Section */}
             <div className="mb-6">
               <div
-                className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl"
+                className="border border-gray-700 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl"
                 style={{
-                  background:
-                    'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))',
+                  background: 'rgba(51,51,51,1)',
                 }}
               >
                 <div className="text-center mb-4 sm:mb-6">
@@ -274,17 +274,19 @@ export default function ChatMessages() {
             {/* Live Network Status */}
             <div className="mb-6">
               <section
-                className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 shadow-xl"
+                className="border border-gray-700 p-4 sm:p-6 shadow-xl"
                 style={{
-                  background:
-                    'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))',
+                  background: 'rgba(51,51,51,1)',
                 }}
                 aria-labelledby="network-status-heading"
                 role="region"
               >
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
                   <div className="text-center flex-1">
-                    <h2 id="network-status-heading" className="text-lg sm:text-xl font-semibold text-gray-100">
+                    <h2
+                      id="network-status-heading"
+                      className="text-lg sm:text-xl font-semibold text-gray-100"
+                    >
                       Live Network Status
                     </h2>
                     {lastUpdated && (
@@ -298,7 +300,11 @@ export default function ChatMessages() {
                     disabled={isRefreshing}
                     className="ml-4 p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 touch-target mobile-press"
                     title="Refresh status data"
-                    aria-label={isRefreshing ? "Refreshing TFL status data" : "Refresh TFL status data"}
+                    aria-label={
+                      isRefreshing
+                        ? 'Refreshing TFL status data'
+                        : 'Refresh TFL status data'
+                    }
                     role="button"
                   >
                     <RefreshCw
@@ -308,7 +314,11 @@ export default function ChatMessages() {
                     />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5" role="grid" aria-label="TFL line status overview">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5"
+                  role="grid"
+                  aria-label="TFL line status overview"
+                >
                   {tflLines.map((line) => (
                     <LineStatusBlock
                       key={line.id}

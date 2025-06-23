@@ -9,12 +9,12 @@
   html {
     font-size: 16px; /* Base font size for better mobile readability */
     scroll-behavior: smooth;
-    background: rgba(51,51,51,1);
+    background: black;
   }
 
   body {
     @apply font-sans antialiased;
-    background: rgba(51,51,51,1);
+    background: black;
     color: #e5e7eb;
     font-size: 1rem; /* 16px base */
     line-height: 1.6; /* Improved line spacing */

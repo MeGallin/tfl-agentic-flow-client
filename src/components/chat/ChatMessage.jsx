@@ -362,7 +362,7 @@ const renderNetworkStatusContent = (content, lineColor) => {
           return (
             <div
               key={index}
-              className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-2 border-blue-500"
+              className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-4 border-blue-500"
             >
               <div className="font-semibold text-blue-300 text-sm mb-1">
                 {cleanLabel.trim()}
@@ -405,7 +405,7 @@ const renderNetworkStatusContent = (content, lineColor) => {
         return (
           <div
             key={index}
-            className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-2 border-blue-500"
+            className="mb-3 ml-4 bg-gray-700/20 p-3 rounded border-l-4 border-blue-500"
           >
             <div className="font-semibold text-blue-300 text-sm mb-1">
               {label.trim()}
@@ -520,69 +520,76 @@ export default function ChatMessage({ message }) {
   };
 
   return (
-    <div
-      className={`flex gap-2 sm:gap-3 ${
-        isUser ? 'justify-end' : 'justify-start'
-      }`}
-    >
+    <div>
       {!isUser && (
-        <div
-          className={`
-          flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8  flex items-center justify-center
-          ${agent ? lineColor.bg : 'bg-gray-200'}
-          ${agent ? lineColor.text : 'text-gray-600'}
-        `}
-        >
-          {getIcon()}
-        </div>
-      )}
+        <>
+          {/* Agent indicator above card for all screen sizes */}
+          {getAgentInfo()}
 
-      <div className={getMessageClasses()}>
-        {getAgentInfo()}
-        <div className="message-content">
-          {renderFormattedContent(
-            message.content,
-            lineColor,
-            agent === 'status' ||
-              (message.content && message.content.includes('Network Status')),
-          )}
-        </div>
-        {/* TFL Data display */}
-        {message.tflData && (
-          <div className="mt-3 p-2 sm:p-3 bg-gray-700  border border-gray-600">
-            <div className="text-xs font-medium text-gray-300 mb-2">
-              TFL Data:
+          {/* Full-width message card */}
+          <div className={getMessageClasses()}>
+            <div className="message-content">
+              {renderFormattedContent(
+                message.content,
+                lineColor,
+                agent === 'status' ||
+                  (message.content &&
+                    message.content.includes('Network Status')),
+              )}
             </div>
-            <div className="text-xs text-gray-400 space-y-1">
-              {message.tflData.line && (
-                <div className="break-words">
-                  Line: {message.tflData.line.name}
+            {/* TFL Data display */}
+            {message.tflData && (
+              <div className="mt-3 p-2 sm:p-3 bg-gray-700  border border-gray-600">
+                <div className="text-xs font-medium text-gray-300 mb-2">
+                  TFL Data:
                 </div>
-              )}
-              {message.tflData.status && (
-                <div className="break-words">
-                  Status: {message.tflData.status[0]?.statusSeverityDescription}
+                <div className="text-xs text-gray-400 space-y-1">
+                  {message.tflData.line && (
+                    <div className="break-words">
+                      Line: {message.tflData.line.name}
+                    </div>
+                  )}
+                  {message.tflData.status && (
+                    <div className="break-words">
+                      Status:{' '}
+                      {message.tflData.status[0]?.statusSeverityDescription}
+                    </div>
+                  )}
+                  {message.tflData.lastUpdated && (
+                    <div className="break-words">
+                      Updated:{' '}
+                      {new Date(
+                        message.tflData.lastUpdated,
+                      ).toLocaleTimeString()}
+                    </div>
+                  )}
                 </div>
-              )}
-              {message.tflData.lastUpdated && (
-                <div className="break-words">
-                  Updated:{' '}
-                  {new Date(message.tflData.lastUpdated).toLocaleTimeString()}
-                </div>
-              )}
+              </div>
+            )}
+            {/* Timestamp */}
+            <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              <span>{formatTime(message.timestamp)}</span>
             </div>
           </div>
-        )}
-        {/* Timestamp */}
-        <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
-          <Clock className="w-3 h-3 flex-shrink-0" />
-          <span>{formatTime(message.timestamp)}</span>
-        </div>
-      </div>
+        </>
+      )}
 
       {isUser && (
-        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8  bg-primary-600 text-white flex items-center justify-center">
-          {getIcon()}
+        <div className="flex gap-2 sm:gap-3 justify-end">
+          <div className={getMessageClasses()}>
+            <div className="message-content">
+              {renderFormattedContent(message.content, lineColor)}
+            </div>
+            {/* Timestamp */}
+            <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              <span>{formatTime(message.timestamp)}</span>
+            </div>
+          </div>
+          <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8  bg-primary-600 text-white flex items-center justify-center">
+            {getIcon()}
+          </div>
         </div>
       )}
     </div>
