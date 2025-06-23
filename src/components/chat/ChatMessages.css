@@ -15,24 +15,27 @@
   }
 }
 
-/* Chat message base styles */
+/* Chat message base styles - Enhanced mobile spacing */
 .chat-message {
   max-width: 95%;
-  padding: 0.875rem;
-  margin-bottom: 0.5rem;
+  padding: 1rem; /* Increased from 0.875rem */
+  margin-bottom: 0.75rem; /* Increased from 0.5rem */
   background: #374151;
   border: 1px solid #4b5563;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.4); /* Enhanced shadow */
   word-wrap: break-word;
   overflow-wrap: break-word;
   color: #e5e7eb;
+  min-height: 44px; /* Accessibility touch target */
+  border-radius: 0.5rem; /* Added border radius for modern look */
 }
 
 /* Desktop styles */
 @media (min-width: 768px) {
   .chat-message {
     max-width: 75%;
-    padding: 1rem;
+    padding: 1.25rem; /* Increased desktop padding */
+    margin-bottom: 1rem;
   }
 }
 
@@ -149,19 +152,19 @@
 
 /* Message content styling - Mobile first */
 .message-content {
-  line-height: 1.5;
-  font-size: 0.875rem;
+  line-height: 1.6;
+  font-size: 1rem; /* Increased from 0.875rem for better readability */
 }
 
 .message-content h3 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   font-weight: 600;
-  font-size: 1.125rem;
+  font-size: 1.25rem; /* Increased for better hierarchy */
   line-height: 1.4;
 }
 
 .message-content p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   line-height: 1.6;
 }
 
@@ -178,12 +181,12 @@
 /* Desktop message content */
 @media (min-width: 768px) {
   .message-content {
-    line-height: 1.6;
-    font-size: 0.9rem;
+    line-height: 1.7;
+    font-size: 1.0625rem; /* Slightly larger on desktop */
   }
 
   .message-content h3 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
   }
 }
 
@@ -216,6 +219,8 @@
     -webkit-touch-callout: none;
     -webkit-user-select: text;
     user-select: text;
+    padding: 1rem; /* Consistent mobile padding */
+    margin-bottom: 0.75rem;
   }
 
   /* Optimize scrolling performance on mobile */
@@ -233,7 +238,7 @@
   /* Better spacing for mobile taps */
   .chat-message .message-content p,
   .chat-message .message-content div {
-    padding: 0.125rem 0;
+    padding: 0.25rem 0; /* Increased from 0.125rem */
   }
 }
 

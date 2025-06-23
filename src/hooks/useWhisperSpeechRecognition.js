@@ -23,7 +23,10 @@ const loadTransformers = async () => {
   return pipeline;
 };
 
-const useWhisperSpeechRecognition = () => {
+const useWhisperSpeechRecognition = ({ 
+  pauseDelay = 3000, // Slightly longer delay for Whisper since it processes in chunks
+  enablePauseDetection = true // Allow disabling pause detection if needed
+} = {}) => {
   const [transcript, setTranscript] = useState('');
   const [listening, setListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +41,8 @@ const useWhisperSpeechRecognition = () => {
   const audioChunksRef = useRef([]);
   const transcribeRef = useRef(null);
   const isInitializedRef = useRef(false);
+  const pauseTimeoutRef = useRef(null);
+  const lastActivityTimeRef = useRef(null);
 
   // Check if Whisper is available on component mount
   useEffect(() => {
@@ -176,6 +181,23 @@ const useWhisperSpeechRecognition = () => {
 
         if (newTranscript && newTranscript.length > 0) {
           setTranscript((prev) => prev + (prev ? ' ' : '') + newTranscript);
+          lastActivityTimeRef.current = Date.now();
+          
+          // Clear any existing pause timeout when we get new transcription
+          if (pauseTimeoutRef.current) {
+            clearTimeout(pauseTimeoutRef.current);
+            pauseTimeoutRef.current = null;
+          }
+          
+          // Set new pause timeout if pause detection is enabled
+          if (enablePauseDetection) {
+            pauseTimeoutRef.current = setTimeout(() => {
+              if (listening) {
+                console.log(`Auto-stopping Whisper after ${pauseDelay}ms pause delay`);
+                stopListening();
+              }
+            }, pauseDelay);
+          }
         }
       } catch (err) {
         console.error('Transcription error:', err);
@@ -273,6 +295,12 @@ const useWhisperSpeechRecognition = () => {
   );
 
   const stopListening = useCallback(() => {
+    // Clear any pending pause timeout when manually stopping
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+      pauseTimeoutRef.current = null;
+    }
+    
     if (
       mediaRecorderRef.current &&
       mediaRecorderRef.current.state !== 'inactive'
@@ -295,6 +323,10 @@ const useWhisperSpeechRecognition = () => {
 
   useEffect(() => {
     return () => {
+      // Cleanup: clear any pending timeouts and stop listening
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
       stopListening();
     };
   }, [stopListening]);

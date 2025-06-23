@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-const useSpeechRecognition = () => {
+const useSpeechRecognition = ({ 
+  pauseDelay = 2500, // Configurable pause delay in milliseconds
+  enablePauseDetection = true // Allow disabling pause detection if needed
+} = {}) => {
   const [transcript, setTranscript] = useState('');
   const [listening, setListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -12,6 +15,8 @@ const useSpeechRecognition = () => {
   const recognitionRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioStreamRef = useRef(null);
+  const pauseTimeoutRef = useRef(null);
+  const lastSpeechTimeRef = useRef(null);
 
   const checkBrowserSupport = useCallback(async () => {
     // Check for Web Speech API support
@@ -64,19 +69,45 @@ const useSpeechRecognition = () => {
 
       recognition.onresult = (event) => {
         let finalTranscript = '';
+        let interimTranscript = '';
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
           if (result.isFinal) {
             finalTranscript += result[0].transcript;
+          } else {
+            interimTranscript += result[0].transcript;
+          }
+        }
+
+        // Update last speech time when we detect any speech activity
+        if (finalTranscript || interimTranscript) {
+          lastSpeechTimeRef.current = Date.now();
+          
+          // Clear any existing pause timeout when user continues speaking
+          if (pauseTimeoutRef.current) {
+            clearTimeout(pauseTimeoutRef.current);
+            pauseTimeoutRef.current = null;
           }
         }
 
         if (finalTranscript) {
           setTranscript(finalTranscript.trim());
-          // Auto-stop listening after receiving final result
-          if (recognitionRef.current) {
-            recognitionRef.current.stop();
+          
+          // Instead of immediately stopping, set a pause timeout
+          // This gives users time to continue speaking after natural pauses
+          if (enablePauseDetection) {
+            pauseTimeoutRef.current = setTimeout(() => {
+              if (recognitionRef.current && listening) {
+                console.log(`Auto-stopping after ${pauseDelay}ms pause delay`);
+                recognitionRef.current.stop();
+              }
+            }, pauseDelay);
+          } else {
+            // If pause detection is disabled, stop immediately (original behavior)
+            if (recognitionRef.current) {
+              recognitionRef.current.stop();
+            }
           }
         }
       };
@@ -130,6 +161,12 @@ const useSpeechRecognition = () => {
   );
 
   const stopListening = useCallback(() => {
+    // Clear any pending pause timeout when manually stopping
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+      pauseTimeoutRef.current = null;
+    }
+    
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
@@ -143,6 +180,10 @@ const useSpeechRecognition = () => {
 
   useEffect(() => {
     return () => {
+      // Cleanup: clear any pending timeouts and stop listening
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
       stopListening();
     };
   }, [stopListening]);

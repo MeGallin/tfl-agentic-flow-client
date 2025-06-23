@@ -105,35 +105,35 @@ export default function ChatMessages() {
     return status?.status || 'Loading...';
   };
 
-  // Helper function to get status styling
+  // Helper function to get status styling - Refined and subtle
   const getStatusStyling = (lineId) => {
     const status = lineStatuses.find((line) => line.id === lineId);
     const statusText = status?.status?.toLowerCase() || '';
 
     if (statusText.includes('good service')) {
-      return 'text-green-600 font-medium bg-gray-100 border border-gray-200';
+      return 'text-white font-normal bg-transparent border border-white/20 shadow-none opacity-70';
     } else if (
       statusText.includes('minor delays') ||
       statusText.includes('minor disruption')
     ) {
-      return 'text-white font-medium bg-red-600 border border-red-500';
+      return 'text-white font-medium bg-orange-600 border border-orange-500 shadow-sm';
     } else if (
       statusText.includes('severe delays') ||
       statusText.includes('severe disruption') ||
       statusText.includes('part closure') ||
       statusText.includes('part suspended')
     ) {
-      return 'text-white font-medium bg-red-600 border border-red-500';
+      return 'text-white font-medium bg-red-600 border border-red-500 shadow-sm';
     } else if (
       statusText.includes('suspended') ||
       statusText.includes('closed')
     ) {
-      return 'text-white font-medium bg-red-600 border border-red-500';
+      return 'text-white font-medium bg-red-700 border border-red-600 shadow-sm';
     } else if (statusText.includes('loading')) {
-      return 'text-gray-400 bg-gray-100 border border-gray-200';
+      return 'text-gray-600 font-normal bg-gray-200 border border-gray-300 animate-pulse';
     }
 
-    return 'text-gray-600 bg-gray-100 border border-gray-200';
+    return 'text-white font-normal bg-transparent border border-white/20 shadow-none opacity-70';
   };
 
   // Helper function to determine if card should be pulsating
@@ -173,18 +173,21 @@ export default function ChatMessages() {
                     Try these examples:
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                   <button
                     onClick={() =>
                       handleQuestionClick("What's the status of all lines?")
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
+                    aria-label="Ask about the status of all TFL lines"
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         📊
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "What's the status of all lines?"
                       </span>
                     </div>
@@ -193,13 +196,13 @@ export default function ChatMessages() {
                     onClick={() =>
                       handleQuestionClick('Next train at Oxford Circus')
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         🚇
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "Next train at Oxford Circus"
                       </span>
                     </div>
@@ -208,13 +211,13 @@ export default function ChatMessages() {
                     onClick={() =>
                       handleQuestionClick('Plan route to Heathrow')
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         ✈️
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "Plan route to Heathrow"
                       </span>
                     </div>
@@ -223,13 +226,13 @@ export default function ChatMessages() {
                     onClick={() =>
                       handleQuestionClick('Circle line disruptions')
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         ⚠️
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "Circle line disruptions"
                       </span>
                     </div>
@@ -238,13 +241,13 @@ export default function ChatMessages() {
                     onClick={() =>
                       handleQuestionClick('Station accessibility info')
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         ♿
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "Station accessibility info"
                       </span>
                     </div>
@@ -253,13 +256,13 @@ export default function ChatMessages() {
                     onClick={() =>
                       handleQuestionClick('Weekend service updates')
                     }
-                    className="bg-gray-700 hover:bg-gray-600 rounded-md p-3 sm:p-4 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600"
+                    className="bg-gray-700 hover:bg-gray-600 rounded-lg p-4 sm:p-5 text-left font-medium sm:font-semibold text-gray-100 shadow-md hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 cursor-pointer group border border-gray-600 touch-target mobile-press tap-highlight-none touch-manipulation"
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-300 group-hover:text-white text-sm sm:text-base">
                         📅
                       </span>
-                      <span className="text-sm sm:text-base">
+                      <span className="text-base sm:text-lg">
                         "Weekend service updates"
                       </span>
                     </div>
@@ -270,16 +273,18 @@ export default function ChatMessages() {
 
             {/* Live Network Status */}
             <div className="mb-6">
-              <div
+              <section
                 className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 p-4 sm:p-6 shadow-xl"
                 style={{
                   background:
                     'linear-gradient(to right, rgba(51,51,51,1), rgba(38,38,38,1))',
                 }}
+                aria-labelledby="network-status-heading"
+                role="region"
               >
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
                   <div className="text-center flex-1">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-100">
+                    <h2 id="network-status-heading" className="text-lg sm:text-xl font-semibold text-gray-100">
                       Live Network Status
                     </h2>
                     {lastUpdated && (
@@ -291,8 +296,10 @@ export default function ChatMessages() {
                   <button
                     onClick={handleRefresh}
                     disabled={isRefreshing}
-                    className="ml-4 p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50"
+                    className="ml-4 p-3 text-gray-400 hover:text-gray-200 hover:bg-gray-700 rounded-md transition-colors disabled:opacity-50 touch-target mobile-press"
                     title="Refresh status data"
+                    aria-label={isRefreshing ? "Refreshing TFL status data" : "Refresh TFL status data"}
+                    role="button"
                   >
                     <RefreshCw
                       className={`w-5 h-5 ${
@@ -301,7 +308,7 @@ export default function ChatMessages() {
                     />
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 lg:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5" role="grid" aria-label="TFL line status overview">
                   {tflLines.map((line) => (
                     <LineStatusBlock
                       key={line.id}
@@ -314,7 +321,7 @@ export default function ChatMessages() {
                     />
                   ))}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>

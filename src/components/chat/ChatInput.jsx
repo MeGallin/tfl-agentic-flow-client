@@ -25,7 +25,7 @@ export default function ChatInput() {
     isLoading,
   } = useConversation();
 
-  // Speech recognition hook - using Web Speech API for better reliability
+  // Speech recognition hook - using Web Speech API with enhanced pause detection
   const {
     transcript,
     listening,
@@ -36,7 +36,10 @@ export default function ChatInput() {
     startListening: speechStart,
     stopListening: speechStop,
     resetTranscript,
-  } = useSpeechRecognition();
+  } = useSpeechRecognition({
+    pauseDelay: 2500, // 2.5 seconds - gives users time to continue speaking
+    enablePauseDetection: true // Enable the improved pause detection
+  });
 
   // Handle speech recognition errors - only log, don't set error to prevent loops
   useEffect(() => {

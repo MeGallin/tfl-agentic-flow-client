@@ -15,16 +15,23 @@ export default function LineStatusBlock({
 
   return (
     <div
-      className="flex flex-col items-center p-2 sm:p-3 border border-gray-600"
+      className="flex flex-col items-center p-3 sm:p-4 border border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 min-h-[88px] sm:min-h-[96px] cursor-pointer hover:scale-105 mobile-press tap-highlight-none touch-manipulation mobile-high-contrast"
       style={{ backgroundColor }}
+      role="gridcell"
+      tabIndex={0}
+      aria-label={`${lineName} line status: ${statusText}`}
+      title={`${lineName} line - ${statusText}`}
     >
-      <span className="inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 text-lg sm:text-xl font-medium text-white">
-        <span>{lineName}</span>
+      <span className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-lg sm:text-xl font-semibold text-white" role="heading" aria-level="3">
+        <span>{lineName.toUpperCase()}</span>
       </span>
       <span
-        className={`text-xs mt-1 text-center px-2 py-1 ${getStatusStyling(
+        className={`text-xs mt-2 text-center px-3 py-1.5 rounded-md font-medium min-h-[24px] flex items-center justify-center ${getStatusStyling(
           lineId,
         )}`}
+        role="status"
+        aria-live={isGoodService ? "polite" : "assertive"}
+        aria-label={`Service status: ${statusText}`}
       >
         {isGoodService ? (
           statusText
